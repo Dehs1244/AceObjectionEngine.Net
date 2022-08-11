@@ -203,7 +203,7 @@ namespace AceObjectionEngine.Engine.Model
         {
             try
             {
-                return new Sprite(new Bitmap(file));
+                return new Sprite(new Bitmap(file, true));
             }
             catch
             {

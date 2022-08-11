@@ -17,6 +17,7 @@ namespace AceObjectionEngine.Engine.Model.Settings
         public int Duration => 0;
 
         public string Text { get; set; }
+        public int FontSize { get; set; } = 24;
         public int Width { get; set; } = 960;
         public int Height { get; set; } = 640;
         public ChatBoxAlign Align { get; set; } = ChatBoxAlign.Bottom;

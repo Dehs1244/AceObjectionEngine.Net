@@ -14,7 +14,7 @@ namespace AceObjectionEngine.Engine.MediaMakers
 
         public IAudioSource Make(string filePath, params object[] args)
         {
-            if (args[1] is TimeSpan offset)
+            if (args[0] is TimeSpan offset)
             {
                 return AudioSource.FromFile(filePath, offset);
             }

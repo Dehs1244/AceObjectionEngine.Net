@@ -24,6 +24,8 @@ namespace AceObjectionEngine.Examples.ImplementationExamples
 
         public Bitmap RawBitmap => throw new NotImplementedException();
 
+        public bool IsFreezeLastOnDelay { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public ISpriteSource[] AnimateFrames()
         {
             throw new NotImplementedException();

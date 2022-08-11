@@ -23,7 +23,6 @@ namespace AceObjectionEngine.Engine.Animator
         private TimeSpan _timeDurationAnimation { get; set; }
         private TimeSpan _timeDurationRendering { get; set; }
 
-        //TODO: Массив аудиодорожек, совмещение аудиодорожек, использование одного файла (аттрибут, AudioOnceRenderAttribute), аттрибут дорожки (AudioTrackRenderAttribute)
         public IAudioMixer AudioMixer { get; protected set; }
 
         public AnimatorRenderIterationsCollection<ISpriteSource> RenderedSprites { get; }

@@ -194,6 +194,29 @@ namespace AceObjectionEngine.Tests
         }
 
         [Fact]
+        public void BuildTestWithLongTextTest()
+        {
+            ObjectionBuilder builder = new ObjectionBuilder();
+            builder.CreateScene((scene) =>
+            {
+                scene.AddCharacter(ObjectionCharacters.PhoenixWrightDefense);
+                scene.AddBackground(new BackgroundPreset(103).LoadObject());
+
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "This is super mega long text with some test from Ace Objection Engine! I really hope it works because I don't want to rewrite all the code and look for an error"
+                });
+            });
+
+            using var animator = builder.Build<ObjectionAnimator>();
+            animator.Animate();
+            var outputPath = "someObjection.mp4";
+            animator.SaveAsFile(outputPath);
+
+            Assert.True(File.Exists(outputPath));
+        }
+
+        [Fact]
         public void BuildTestWithCustomAnimatedBackground()
         {
             ObjectionBuilder builder = new ObjectionBuilder();

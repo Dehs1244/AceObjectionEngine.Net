@@ -26,6 +26,7 @@ namespace AceObjectionEngine.Engine.Model.Layout
         public AceSize AnimatorSize { get; }
         public ChatBoxAlign Align { get; }
         public TimeSpan DurationCounter => Sprite.Duration;
+        public int FontSize { get; }
 
         public IAudioSource AudioSource { get; private set; }
         public ICharacter ReferenceCharacter { get; }
@@ -38,6 +39,7 @@ namespace AceObjectionEngine.Engine.Model.Layout
             Text = settings.Text;
             Align = settings.Align;
             ReferenceCharacter = character;
+            FontSize = settings.FontSize;
             Sprite = _DrawSprite();
             Text = settings.Text;
         }
@@ -70,11 +72,18 @@ namespace AceObjectionEngine.Engine.Model.Layout
 
                 using (Graphics graphics = Graphics.FromImage(frame))
                 {
+                    graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                    graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                    graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                    graphics.TextContrast = 11;
+                    graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+
                     var font = new Font("Arial", 14);
                     Rectangle chatBoxRect = new Rectangle(positionX, positionY, AnimatorSize.Width - 15, chatBoxSize.Height);
                     graphics.FillRoundedRectangle(new SolidBrush(chatBoxBackgroundColor), chatBoxRect, 6);
                     graphics.DrawRoundedRectangle(borderRadiusPen, chatBoxRect, 6);
-                    graphics.DrawString(printableText, font, Brushes.White, 15, positionY);
+                    graphics.DrawString(printableText, new Font("Arial", FontSize), Brushes.White, chatBoxRect); //15, positionY);
 
                     var namePlateSize = graphics.MeasureString(ReferenceCharacter.NamePlate, font);
                     Rectangle namePlateRect = new Rectangle(positionX + 5, positionY - 35, (int)(namePlateSize.Width + 10), (int)(namePlateSize.Height + 10));
