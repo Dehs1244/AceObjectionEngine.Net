@@ -1,7 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>net462;net5.0;net6.0</TargetFrameworks>
+	  <TargetFrameworks>net462;net5.0;net6.0;netstandard2.0</TargetFrameworks>
+	  
+	  <PackageId>AceObjectionEngine.Net</PackageId>
+	  <Version>1.0.0</Version>
+	  <Authors>Dehs</Authors>
+	  <Company>Blowout Studio</Company>
+	  <PackageTags>Animation;FFMpeg;Ace Attorney;Objection;Ace Attorney Objection;Video Animation;Video;Audio Animation</PackageTags>
+	  <PackageIconUrl>https://i.ibb.co/pKDK4xz/imgonline-com-ua-Resize-Wgv-GZa4efk-KQ.png</PackageIconUrl>
+	  <Description>
+		  A .Net library for creating scenes based on text from the Ace Attorney game.
+		  Assets from library is also based on a website dedicated to creating these scenes, Objection.lol.
+		  The library is based on its own animation engine for scene objects and can be extensible.
+
+		  Animation based on `FFMpeg` and `System.Drawings`, but you can use your own animation library.
+		  The modules in the library are extensible and can easily be replaced with their own.
+
+		  See the documentation in the github repository: https://github.com/Dehs1244/AceObjectionEngine.Net
+	  </Description>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <RepositoryUrl>https://github.com/Dehs1244/AceObjectionEngine.Net</RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/Dehs1244/AceObjectionEngine.Net</PackageProjectUrl>
+	  
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
