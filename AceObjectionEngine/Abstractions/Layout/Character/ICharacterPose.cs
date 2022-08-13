@@ -16,5 +16,6 @@ namespace AceObjectionEngine.Abstractions.Layout.Character
         IAudioSource[] AudioTicks { get; }
 
         bool Play();
+        void SetStartPoseState<T>() where T : IPoseAction;
     }
 }

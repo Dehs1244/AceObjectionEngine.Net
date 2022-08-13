@@ -20,8 +20,8 @@ namespace AceObjectionEngine.Engine.Animator
 
         public int SpriteIteration { get; set; }
         public int AudioSourceIteration { get; set; }
-        private TimeSpan _timeDurationAnimation { get; set; }
-        private TimeSpan _timeDurationRendering { get; set; }
+        protected TimeSpan TimeLineAnimationDuration { get; set; }
+        protected TimeSpan TimeLineRenderDuration { get; set; }
 
         public IAudioMixer AudioMixer { get; protected set; }
 
@@ -51,7 +51,6 @@ namespace AceObjectionEngine.Engine.Animator
             List<ISpriteSource> animationCurrentFrames = new List<ISpriteSource>();
 
             var renderInvoke = layerCollection[index].InvokeOnRender(layerCollection[index], layerCollection.Select(x => x.AnimationObject).ToList());
-
             if (renderInvoke.IsAction) animationCurrentFrames = renderInvoke.Animation.ToList();
             else animationCurrentFrames = layerCollection[index].Sprite.AnimateFrames().ToList();
 
@@ -82,8 +81,8 @@ namespace AceObjectionEngine.Engine.Animator
             }
 
 
-            layerCollection[index].CurrentAnimationDuration = _timeDurationAnimation;
-            layerCollection[index].CurrentRenderFrameDuration = _timeDurationRendering;
+            layerCollection[index].CurrentAnimationDuration = TimeLineAnimationDuration;
+            layerCollection[index].CurrentRenderFrameDuration = TimeLineRenderDuration;
             layerCollection[index].EndAnimationDuration = layerCollection[index].AnimationObject.Sprite.Duration;
             if (layerCollection[index].AudioSource != null)
                 RenderAudio(EnumerableHelper.ToEnumerable(layerCollection[index]).ToArray());
@@ -137,39 +136,35 @@ namespace AceObjectionEngine.Engine.Animator
             await Task.Run(async () =>
             {
                 RenderedSprites.StartIteration(SpriteIteration);
-                ISpriteSource result = new Sprite(new System.Drawing.Bitmap(layerSprites.First().Sprite.RawBitmap));
+                ISpriteSource result = new Sprite(new System.Drawing.Bitmap(layerSprites.First().Sprite.Width, layerSprites.First().Sprite.Height));
                 bool usedParallelRender = false;
                 int toSkipRenders = 0;
+                foreach(var layerSprite in layerSprites)
+                {
+                    await layerSprite.AnimationObject.StartAnimationAsync();
+                }
+
                 for (var i = 0; i < layerSprites.Count(); i++)
                 {
                     toSkipRenders = i;
                     usedParallelRender = false;
-                    if (layerSprites[i].Sprite.IsAnimated)
-                    {
-                        var animated = UseParallelAnimation(layerSprites, i, out toSkipRenders);
-                        //if (layerSprites[i].CanParallelRender()) nextRenderSkip = true;
-                        usedParallelRender = true;
-                        ISpriteSource coreAnimationFrame = (ISpriteSource)result.Clone();
 
-                        foreach (var animatedFrame in animated)
-                        {
-                            var renderingFrame = (ISpriteSource)coreAnimationFrame.Clone();
-                            renderingFrame.MergeSprite(animatedFrame);
-                            await RenderLayerSpriteAsync(renderingFrame);
+                    var animated = UseParallelAnimation(layerSprites, i, out toSkipRenders);
+                    //if (layerSprites[i].CanParallelRender()) nextRenderSkip = true;
+                    usedParallelRender = true;
+                    ISpriteSource coreAnimationFrame = (ISpriteSource)result.Clone();
 
-                            RenderedSprites.Add((ISpriteSource)renderingFrame.Clone());
-                            renderingFrame.Dispose();
-                        }
-                        //AddTime(Frame.CalculateDuration(animated.Count()));
-                        coreAnimationFrame.Dispose();
-                    }
-                    else
+                    foreach (var animatedFrame in animated)
                     {
-                        result = result.MergeSprite(layerSprites[i].Sprite);
-                        //if (layerSprites[i].CanParallelRender()) nextRenderSkip = true;
-                        RenderedSprites.Add(result);
-                        AddTime(Frame.CalculateDuration(1));
+                        var renderingFrame = (ISpriteSource)coreAnimationFrame.Clone();
+                        renderingFrame.MergeSprite(animatedFrame);
+                        await RenderLayerSpriteAsync(renderingFrame);
+
+                        RenderedSprites.Add((ISpriteSource)renderingFrame.Clone());
+                        renderingFrame.Dispose();
                     }
+                    //AddTime(Frame.CalculateDuration(animated.Count()));
+                    coreAnimationFrame.Dispose();
 
                     if (usedParallelRender) i = toSkipRenders + 1;
                 }
@@ -188,7 +183,7 @@ namespace AceObjectionEngine.Engine.Animator
                     {
                         for(var y = 0; y < layerAudioSources[i].AudioTicks.Count(); y++)
                         {
-                            IAudioSource audioTickRender = await RenderAudioTickAsync(layerAudioSources[i].AudioTicks[y], _timeDurationRendering);
+                            IAudioSource audioTickRender = await RenderAudioTickAsync(layerAudioSources[i].AudioTicks[y], TimeLineRenderDuration);
                             AudioMixer.Mix(ref audioTickRender);
                             audioTickRender.Dispose();
                         }
@@ -209,7 +204,7 @@ namespace AceObjectionEngine.Engine.Animator
 
         public void ResetAudioMixer(TimeSpan timeLine)
         {
-            _timeDurationRendering = TimeSpan.Zero;
+            TimeLineRenderDuration = TimeSpan.Zero;
             RenderedAudioMixers.StartIteration(AudioSourceIteration);
             AudioMixer = CreateAudioMixer(timeLine);
             RenderedAudioMixers.Add(AudioMixer);
@@ -219,8 +214,8 @@ namespace AceObjectionEngine.Engine.Animator
 
         public void AddTime(TimeSpan time)
         {
-            _timeDurationAnimation = _timeDurationAnimation.Add(time);
-            _timeDurationRendering = _timeDurationRendering.Add(time);
+            TimeLineAnimationDuration = TimeLineAnimationDuration.Add(time);
+            TimeLineRenderDuration = TimeLineRenderDuration.Add(time);
         }
 
         public void Dispose()

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
+using AceObjectionEngine.Engine.Enums;
 
 namespace AceObjectionEngine.Tests.TestObjects
 {
@@ -25,6 +26,8 @@ namespace AceObjectionEngine.Tests.TestObjects
         public string Format => throw new NotImplementedException();
 
         public TimeSpan Duration => throw new NotImplementedException();
+
+        public DelayMode DelayMode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public ISpriteSource[] AnimateFrames()
         {

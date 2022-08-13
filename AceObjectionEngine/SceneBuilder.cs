@@ -16,6 +16,7 @@ namespace AceObjectionEngine
         private Frame _frame = new Frame();
         private ObjectionSettings _settings;
         private Stack<ICharacter> _createdCharacters = new Stack<ICharacter>();
+        private bool _addedCharacter;
 
         public SceneBuilder(ObjectionSettings settings)
         {
@@ -26,6 +27,7 @@ namespace AceObjectionEngine
         {
             _frame.Objects.Add(_settings.CharacterLayer, character);
             _createdCharacters.Push(character);
+            _addedCharacter = true;
             return this;
         }
 
@@ -55,6 +57,8 @@ namespace AceObjectionEngine
             Bubble emptyBubble = null;
             _frame.Objects.Add(_settings.BubbleLayer, emptyBubble);
             _frame.Objects.Add(_settings.DialogueLayer, new ChatBox(_createdCharacters.Peek(), dialogueSettings));
+            if (!_addedCharacter) AddCharacter(_createdCharacters.Peek());
+            _addedCharacter = false;
             return this;
         }
 

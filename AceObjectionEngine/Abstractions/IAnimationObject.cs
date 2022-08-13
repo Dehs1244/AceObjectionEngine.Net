@@ -11,6 +11,10 @@ namespace AceObjectionEngine.Abstractions
     public interface IAnimationObject : IAnimationObjectAsync
     {
         /// <summary>
+        /// Called at start of animation object
+        /// </summary>
+        void StartAnimation();
+        /// <summary>
         /// Called at each end of the animation
         /// </summary>
         void EndAnimation();

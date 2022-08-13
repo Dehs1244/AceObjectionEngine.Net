@@ -63,9 +63,12 @@ namespace AceObjectionEngine.Engine.Model.Layout
         {
         }
 
-        public Task EndAnimationAsync()
+        public async Task EndAnimationAsync() => await Task.Run(EndAnimation);
+
+        public void StartAnimation()
         {
-            return Task.CompletedTask;
         }
+
+        public async Task StartAnimationAsync() => await Task.Run(StartAnimation);
     }
 }

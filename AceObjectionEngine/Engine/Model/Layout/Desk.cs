@@ -35,5 +35,15 @@ namespace AceObjectionEngine.Engine.Model.Layout
         {
             throw new NotImplementedException();
         }
+
+        public void StartAnimation()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task StartAnimationAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

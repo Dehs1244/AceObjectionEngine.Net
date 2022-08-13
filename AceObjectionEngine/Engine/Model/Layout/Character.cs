@@ -36,7 +36,14 @@ namespace AceObjectionEngine.Engine.Model.Layout
 
         public IAudioSource AudioSource { get; }
 
-        public int StatePoseId { get; set; }
+        private int _poseId { get; set; }
+        private bool _isPoseChanged;
+        public int StatePoseId { get => _poseId; set
+            {
+                _isPoseChanged = true;
+                _poseId = value;
+            }
+        }
 
         public bool IsNeedReRender { get; set; } = true;
 
@@ -71,27 +78,34 @@ namespace AceObjectionEngine.Engine.Model.Layout
             settings.Poses.AddRange(Poses);
             settings.Sex = settings.Sex ?? Sex;
             settings.Side = settings.Side ?? Side;
+            settings.Id = Id;
 
             return new Character(settings);
         }
 
         public Character WithPose(int poseId)
         {
-            StatePoseId = poseId;
-            return this;
+            return WithSettings(new CharacterSettings(Id)
+            {
+                PoseId = poseId
+            });
         }
 
         public Character WithFirstPose()
         {
-            StatePoseId = Poses.First().Id;
-            return this;
+            return WithSettings(new CharacterSettings(Id)
+            {
+                PoseId = Poses.First().Id
+            });
         }
 
         public Character WithRandomPose()
         {
             var pose = Poses.ElementAt(new Random().Next(0, Poses.Count));
-            StatePoseId = pose.Id;
-            return this;
+            return WithSettings(new CharacterSettings(Id)
+            {
+                PoseId = pose.Id
+            });
         }
 
         public void Dispose()
@@ -104,10 +118,8 @@ namespace AceObjectionEngine.Engine.Model.Layout
 
         public void EndAnimation()
         {
-            if (!ActivePose.Play())
-            {
-                IsNeedReRender = false;
-            }
+            IsNeedReRender = ActivePose.Play();
+            _isPoseChanged = false;
         }
 
         public async Task EndAnimationAsync() => await Task.Run(EndAnimation);
@@ -116,5 +128,14 @@ namespace AceObjectionEngine.Engine.Model.Layout
         {
             return ActivePose.ActivePoseState.Action(source, parallelObjects);
         }
+
+        public void StartAnimation()
+        {
+            IsNeedReRender = true;
+            ActivePose.StartAnimation();
+            if (!_isPoseChanged) ActivePose.SetStartPoseState<SpeakingPoseAction>();
+        }
+
+        public async Task StartAnimationAsync() => await Task.Run(StartAnimation);
     }
 }

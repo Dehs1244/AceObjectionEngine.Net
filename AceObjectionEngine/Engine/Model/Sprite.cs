@@ -14,6 +14,7 @@ using AceObjectionEngine.Exceptions;
 using FFMpegCore.Pipes;
 using AceObjectionEngine.Engine.Animator;
 using AceObjectionEngine.Extensions;
+using AceObjectionEngine.Engine.Enums;
 
 namespace AceObjectionEngine.Engine.Model
 {
@@ -67,7 +68,7 @@ namespace AceObjectionEngine.Engine.Model
             }
         }
 
-        public bool IsFreezeLastOnDelay { get; set; }
+        public DelayMode DelayMode { get; set; }
 
         public Sprite(Bitmap source)
         {
@@ -180,21 +181,21 @@ namespace AceObjectionEngine.Engine.Model
 
         public ISpriteSource[] AnimateFrames()
         {
-            if (!IsAnimated) return new Sprite[1] { this }.WithDelay(Delay, IsFreezeLastOnDelay);
+            if (!IsAnimated) return new Sprite[1] { this }.WithDelay(Delay, DelayMode);
 
             ICollection<ISpriteSource> frames = new List<ISpriteSource>();
             FrameDimension dimension = new FrameDimension(RawBitmap.FrameDimensionsList[0]);
-            while (_frameAnimating < FrameCount)
+            do
             {
-                frames.Add((Sprite)Clone());
                 RawBitmap.SelectActiveFrame(dimension, _frameAnimating);
+                frames.Add((Sprite)Clone());
                 OnAnimation?.Invoke(_frameAnimating, frames.Last());
                 _frameAnimating++;
-            }
+            } while (_frameAnimating < FrameCount);
 
             _frameAnimating = 0;
 
-            return frames.WithDelay(Delay, IsFreezeLastOnDelay);
+            return frames.WithDelay(Delay, DelayMode);
         }
 
         public object Clone() => new Sprite(new Bitmap(RawBitmap));
@@ -220,9 +221,12 @@ namespace AceObjectionEngine.Engine.Model
         {
         }
 
-        public Task EndAnimationAsync()
+        public async Task EndAnimationAsync() => await Task.Run(EndAnimation);
+
+        public void StartAnimation()
         {
-            return Task.CompletedTask;
         }
+
+        public async Task StartAnimationAsync() => await Task.Run(StartAnimation);
     }
 }

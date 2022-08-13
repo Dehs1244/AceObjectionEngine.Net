@@ -15,7 +15,7 @@ namespace AceObjectionEngine.Engine.Infrastructure
     /// <typeparam name="T">Objection Object</typeparam>
     public abstract class BaseSettings<T> : IObjectionSettings<T> where T : class, IObjectionObject
     {
-        public int Id { get; protected set; }
+        public int Id { get; set; }
 
         public int Duration { get; }
 

@@ -16,6 +16,6 @@ namespace AceObjectionEngine.Engine.PoseActions
         public TimeSpan Duration => TimeSpan.Zero;
 
         public RenderActionConsequence Action(AnimationRenderContext sourceContext, ICollection<IAnimationObject> parallelObjects)
-            => RenderActionConsequence.FromEmpty();
+            => new RenderActionConsequence(State.AnimateFrames());
     }
 }

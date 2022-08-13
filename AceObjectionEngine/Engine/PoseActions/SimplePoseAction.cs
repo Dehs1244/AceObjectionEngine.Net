@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Engine.Animator;
 using AceObjectionEngine.Engine.Model;
+using AceObjectionEngine.Extensions;
 
 namespace AceObjectionEngine.Engine.PoseActions
 {
@@ -16,6 +17,6 @@ namespace AceObjectionEngine.Engine.PoseActions
         public TimeSpan Duration => State.Duration;
 
         RenderActionConsequence IPoseAction.Action(AnimationRenderContext sourceContext, ICollection<IAnimationObject> parallelObjects)
-            => RenderActionConsequence.FromEmpty();
+            => new RenderActionConsequence(State.AnimateFrames().WithDelay(Delay, State.DelayMode));
     }
 }

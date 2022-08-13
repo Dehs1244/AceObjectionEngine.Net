@@ -27,6 +27,11 @@ namespace AceObjectionEngine.Engine.Model.Settings
         {
         }
 
+        public CharacterSettings(int id)
+        {
+            Id = id;
+        }
+
         public CharacterSettings(AssetJson fromJson) : base(fromJson)
         {
         }

@@ -52,6 +52,8 @@ namespace AceObjectionEngine.Engine.Animator
                     audio = audio.Merge(audioMixer.Create());
                 }
             }
+            audio = audio.SetDuration(TimeLineAnimationDuration);
+
             if (audio != null) factory.AddFileInput(audio.FilePath);
 
             await factory?.OutputToPipe(_pipeStream, options =>

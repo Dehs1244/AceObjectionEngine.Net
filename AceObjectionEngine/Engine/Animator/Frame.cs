@@ -21,6 +21,7 @@ namespace AceObjectionEngine.Engine.Animator
     {
         public static TimeSpan CalculateDuration(int frameCount) => TimeSpan.FromSeconds((double)(frameCount) / ((double)ObjectionAnimator.FrameRate));
         public static double SamplingFromObjectionLolTime(double time) => time * (15d / ((double)ObjectionAnimator.FrameRate));
+        public static int FrameCountFromDuration(TimeSpan duration) => (int)Math.Round(duration.TotalSeconds * ((double)ObjectionAnimator.FrameRate)); 
 
         public AnimatorLayersCollection<Frame> Objects { get; }
         public TimeSpan Duration => TimeSpan.FromTicks(Objects.AsAnimationObjectEnumerable().Where(x=> x != null)

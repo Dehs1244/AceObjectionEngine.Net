@@ -29,5 +29,11 @@ namespace AceObjectionEngine.Abstractions.Async
         /// </summary>
         /// <returns></returns>
         Task EndAnimationAsync();
+
+        /// <summary>
+        /// Asynchronous called at start of animation object
+        /// </summary>
+        /// <returns></returns>
+        Task StartAnimationAsync();
     }
 }

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Engine.Animator;
+using AceObjectionEngine.Engine.Enums;
 using AceObjectionEngine.Extensions;
 
 namespace AceObjectionEngine.Engine.Model
@@ -44,9 +45,9 @@ namespace AceObjectionEngine.Engine.Model
 
         object IEnumerator.Current => Current;
 
-        public bool IsFreezeLastOnDelay { get; set; }
+        public DelayMode DelayMode { get; set; }
 
-        public ISpriteSource[] AnimateFrames() => _frames.WithDelay(Delay, IsFreezeLastOnDelay);
+        public ISpriteSource[] AnimateFrames() => _frames.WithDelay(Delay, DelayMode);
 
         public object Clone() => (GifSprite)MemberwiseClone();
 

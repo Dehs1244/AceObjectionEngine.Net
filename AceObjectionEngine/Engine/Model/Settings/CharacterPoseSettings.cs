@@ -62,9 +62,10 @@ namespace AceObjectionEngine.Engine.Model.Settings
             foreach(var assetPoseState in json["states"])
             {
                 if(assetPoseState.ContainsKey("imageUrl")) throw new ObjectionNotLoadedException(this);
+                var state = Sprite.FromFile(assetPoseState["fileName"]);
                 poseState.Add(new PoseActions.SimplePoseAction()
                 {
-                    State = Sprite.FromFile(assetPoseState["fileName"]),
+                    State = state,
                     Delay = TimeSpan.FromMilliseconds(assetPoseState["nextPoseDelay"])
                 });
             }
