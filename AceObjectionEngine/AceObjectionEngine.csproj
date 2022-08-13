@@ -4,7 +4,7 @@
 	  <TargetFrameworks>net462;net5.0;net6.0;netstandard2.0</TargetFrameworks>
 	  
 	  <PackageId>AceObjectionEngine.Net</PackageId>
-	  <Version>1.0.1</Version>
+	  <Version>1.0.2</Version>
 	  <Authors>Dehs</Authors>
 	  <Company>Blowout Studio</Company>
 	  <PackageTags>Animation;FFMpeg;Ace Attorney;Objection;Ace Attorney Objection;Video Animation;Video;Audio Animation</PackageTags>
@@ -14,7 +14,7 @@
 		  Assets from library is also based on a website dedicated to creating these scenes, Objection.lol.
 		  The library is based on its own animation engine for scene objects and can be extensible.
 
-		  Animation based on `FFMpeg` and `System.Drawings`, but you can use your own animation library.
+		  Animation based on `FFMpeg` and `System.Drawing`, but you can use your own animation library.
 		  The modules in the library are extensible and can easily be replaced with their own.
 
 		  See the documentation in the github repository: https://github.com/Dehs1244/AceObjectionEngine.Net
@@ -24,6 +24,7 @@
 		  - Fixed animation of frames
 		  - The rendering system has been changed
 		  - Fixed zero frame in rendering
+		  - Changed Pose Actions
 	  </PackageReleaseNotes>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <RepositoryUrl>https://github.com/Dehs1244/AceObjectionEngine.Net</RepositoryUrl>
