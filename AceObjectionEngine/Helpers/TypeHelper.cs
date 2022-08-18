@@ -25,5 +25,9 @@ namespace AceObjectionEngine.Helpers
         public static T GetExtensiveAttribute<T>(object obj, bool inherit)
             where T : Attribute
             => GetExtensiveAttribute<T>(obj.GetType(), false);
+
+        public static bool AreSame(Type a, Type b) => a.BaseType == b.BaseType
+        || a.IsAssignableFrom(b)
+        || b.IsAssignableFrom(a);
     }
 }

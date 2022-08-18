@@ -253,6 +253,74 @@ namespace AceObjectionEngine.Tests
         }
 
         [Fact]
+        public void BuildMyObjection()
+        {
+            ObjectionBuilder builder = new ObjectionBuilder();
+
+            builder.CreateScene((scene) =>
+            {
+                scene.AddAudio(ObjectionMusic.Objection);
+                scene.AddBackground(ObjectionBackgrounds.PWWitness);
+
+                scene.AddCharacter(ObjectionCharacters.PhoenixWrightDefense.WithRandomPose());
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "Test dialogue with deks"
+                });
+
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "And another dialogue"
+                });
+
+                scene.AddCharacter(ObjectionCharacters.MilesEdgeworthProsecution);
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "Nice desk"
+                });
+
+                scene.AddCharacter(ObjectionCharacters.MilesEdgeworthProsecution);
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "And then this"
+                });
+
+                scene.AddCharacter(ObjectionCharacters.MilesEdgeworthProsecution);
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "And then this and this and this and this and this and this and this and this and this and this and this"
+                });
+
+                scene.AddCharacter(ObjectionCharacters.MilesEdgeworthProsecution.WithFirstPose());
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "So this"
+                });
+                scene.AddCharacter(ObjectionCharacters.MilesEdgeworthProsecution);
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "And then this and this and this and this and this and this and this and this and this and this and this"
+                });
+                scene.AddCharacter(ObjectionCharacters.MilesEdgeworthProsecution.WithRandomPose());
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "So this"
+                });
+                scene.AddCharacter(ObjectionCharacters.MilesEdgeworthProsecution.WithRandomPose());
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "And then this and this and this and this and this and this and this and this and this and this and this"
+                });
+            });
+
+            using var animator = builder.Build<ObjectionAnimator>();
+            animator.Animate();
+
+            var outputPath = "MyObjection.mp4";
+            animator.SaveAsFile(outputPath);
+        }
+
+        [Fact]
         public void BuildTestWithCustomAnimatedBackground()
         {
             ObjectionBuilder builder = new ObjectionBuilder();

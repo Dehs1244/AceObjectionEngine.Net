@@ -9,7 +9,7 @@ using AceObjectionEngine.Engine.Enums;
 
 namespace AceObjectionEngine.Abstractions.Layout.Character
 {
-    [ParallelAnimationOptions(AnimationStateBreaker.Origin)]
+    [ParallelAnimationOptions(AnimationStateBreaker.Origin, BreakOnlyFor = new Type[] { typeof(IChatBox) } )]
     [ParallelAnimationDeception(typeof(IChatBox))]
     public interface ICharacter : IObjectionObject, IRenderInvokable
     {

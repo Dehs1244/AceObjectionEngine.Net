@@ -47,7 +47,7 @@ namespace AceObjectionEngine.Engine.Animator
         public virtual void RenderAudio(AnimationRenderContext[] layerAudioSources) => RenderAudioAsync(layerAudioSources).GetAwaiter().GetResult();
         public virtual void RenderSprite(AnimationRenderContext[] layerSprites) => RenderSpriteAsync(layerSprites).GetAwaiter().GetResult();
 
-        public static IList<ISpriteSource> MergeAnimations(IList<ISpriteSource> firstFrames, IList<ISpriteSource> secondFrames, AnimationRenderContext context)
+        public static IList<ISpriteSource> MergeAnimations(IList<ISpriteSource> firstFrames, IList<ISpriteSource> secondFrames, Attributes.AnimationStateBreaker breaker, bool repeatOnBreak = false)
         {
             if (!firstFrames.Any()) return secondFrames;
             if (!secondFrames.Any()) return firstFrames;
@@ -56,25 +56,25 @@ namespace AceObjectionEngine.Engine.Animator
             var firstFrameIteration = 0;
             var secondFrameIteration = 0;
 
-            var processingCounter = context.Breaker == Attributes.AnimationStateBreaker.Parallel ? firstFrames.Count : secondFrames.Count;
+            var processingCounter = breaker == Attributes.AnimationStateBreaker.Parallel ? firstFrames.Count : secondFrames.Count;
 
             for (var i = 0; i < processingCounter; i++)
             {
-                var passiveAnimationFrameError = context.Breaker == Attributes.AnimationStateBreaker.Parallel ?
+                var passiveAnimationFrameError = breaker == Attributes.AnimationStateBreaker.Parallel ?
                 secondFrameIteration >= secondFrames.Count
                 : firstFrameIteration >= firstFrames.Count;
 
                 if (passiveAnimationFrameError)
                 {
                     //if (context.Breaker == Attributes.AnimationStateBreaker.Origin) break;
-                    switch (context.Breaker)
+                    switch (breaker)
                     {
                         case Attributes.AnimationStateBreaker.Origin:
-                            if (!context.RepeatOnBreak) secondFrames.Add((ISpriteSource)firstFrames.Last().Clone());
+                            if (!repeatOnBreak) secondFrames.Add((ISpriteSource)firstFrames.Last().Clone());
                             else firstFrameIteration = 0;
                             break;
                         case Attributes.AnimationStateBreaker.Parallel:
-                            if (!context.RepeatOnBreak) secondFrames.Add((ISpriteSource)secondFrames.Last().Clone());
+                            if (!repeatOnBreak) secondFrames.Add((ISpriteSource)secondFrames.Last().Clone());
                             else secondFrameIteration = 0;
                             break;
                     }

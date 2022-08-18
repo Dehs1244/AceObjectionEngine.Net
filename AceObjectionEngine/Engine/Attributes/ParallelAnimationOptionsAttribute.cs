@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AceObjectionEngine.Abstractions;
+using AceObjectionEngine.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,7 +33,7 @@ namespace AceObjectionEngine.Engine.Attributes
         /// <summary>
         /// The culprit of the end of the animation
         /// </summary>
-        public AnimationStateBreaker Breaker;
+        public AnimationStateBreaker SourceBreaker;
         /// <summary>
         /// Allows the culprit to re-play the animation
         /// </summary>
@@ -40,19 +42,30 @@ namespace AceObjectionEngine.Engine.Attributes
         /// Is skip next render
         /// </summary>
         public bool IsSkip;
+        /// <summary>
+        /// Sets the value of the breaker only for the specified types, otherwise inverts the value
+        /// </summary>
+        public Type[] BreakOnlyFor;
 
         public static ParallelAnimationOptionsAttribute Default => new ParallelAnimationOptionsAttribute()
         {
-            Breaker = AnimationStateBreaker.Origin,
+            SourceBreaker = AnimationStateBreaker.Origin,
             RepeatOnBreak = true,
+            BreakOnlyFor = Array.Empty<Type>(),
             IsSkip = true
         };
         
-        public ParallelAnimationOptionsAttribute(AnimationStateBreaker breaker = AnimationStateBreaker.Origin, bool repeatOnBreak = true, bool isSkipRender = true)
+        public ParallelAnimationOptionsAttribute(AnimationStateBreaker breaker = AnimationStateBreaker.Origin, bool repeatOnBreak = true, bool isSkipRender = true, params Type[] breakOnlyFor)
         {
-            Breaker = breaker;
+            SourceBreaker = breaker;
             RepeatOnBreak = repeatOnBreak;
             IsSkip = isSkipRender;
+            BreakOnlyFor = breakOnlyFor;
         }
+
+        public AnimationStateBreaker InvertBreaker() => SourceBreaker == AnimationStateBreaker.Origin ? AnimationStateBreaker.Parallel : AnimationStateBreaker.Origin;
+
+        public bool CheckForBreakOnly(IAnimationObject mergingObject) => BreakOnlyFor.Any() ?
+            BreakOnlyFor.Any(x => TypeHelper.AreSame(x, mergingObject.GetType())) : true;
     }
 }

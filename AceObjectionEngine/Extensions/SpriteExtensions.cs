@@ -15,6 +15,7 @@ namespace AceObjectionEngine.Extensions
         {
             if (delay.Ticks < 1) return frames;
             var framesDuration = Frame.CalculateDuration(frames.Count());
+            if (framesDuration >= delay) return frames;
 
             var allFrames = frames.ToList();
             var iteration = 0;

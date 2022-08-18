@@ -29,7 +29,7 @@ namespace AceObjectionEngine.Engine.Animator
             character.ActivePose.AudioTicks 
             : Array.Empty<IAudioSource>();
 
-        public AnimationStateBreaker Breaker => ParallelOptions.Breaker;
+        public AnimationStateBreaker SourceBreaker => ParallelOptions.SourceBreaker;
         public bool RepeatOnBreak => ParallelOptions.RepeatOnBreak;
         public bool IsSkipRender => ParallelOptions.IsSkip;
 

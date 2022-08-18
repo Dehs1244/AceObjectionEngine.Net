@@ -16,6 +16,7 @@ namespace AceObjectionEngine.Engine.Animator.Behaviours
         public int RendersToSkip;
 
         private List<Type> _closedRenders = new List<Type>();
+        private List<IAnimationObject> _animatedObjects = new List<IAnimationObject>();
 
         public ParallelRenderingBehaviour(FrameRenderFactory factory, AnimationRenderContext[] layers)
         {
@@ -23,15 +24,15 @@ namespace AceObjectionEngine.Engine.Animator.Behaviours
             _renderFactory = factory;
         }
 
-        private bool _IsNeedToAnimate(IAnimationObject animationObject) => !_closedRenders.Any(x=> x.BaseType == animationObject.GetType().BaseType 
-        || x.IsAssignableFrom(animationObject.GetType())
-        || animationObject.GetType().IsAssignableFrom(x));
+        private bool _IsNeedToAnimate(IAnimationObject animationObject) => !_closedRenders.Any(x=> TypeHelper.AreSame(x, animationObject.GetType()));
 
         public ISpriteSource[] Use(int index)
         {
-            if (Contexts[index].IsNonRenderObject) return Array.Empty<ISpriteSource>();
 
             var isNeedToAnimate = _IsNeedToAnimate(Contexts[index].AnimationObject);
+            if (Contexts[index].IsNonRenderObject) return Array.Empty<ISpriteSource>();
+
+            if(isNeedToAnimate) _animatedObjects.Add(Contexts[index].AnimationObject);
 
             List<ISpriteSource> animationCurrentFrames = new List<ISpriteSource>();
 
@@ -54,8 +55,10 @@ namespace AceObjectionEngine.Engine.Animator.Behaviours
                     Contexts[index].DeceptionLayers != null) _closedRenders.AddRange(Contexts[index].DeceptionLayers.Misleaders);
                 var parallelFrames = Use(index + 1);
                 List<ISpriteSource> renderedParallelAnimation = new List<ISpriteSource>();
+                var breaker = _animatedObjects.Any(x => Contexts[index].ParallelOptions.CheckForBreakOnly(x)) ? Contexts[index].SourceBreaker 
+                    : Contexts[index].ParallelOptions.InvertBreaker();
 
-                renderedParallelAnimation.AddRange(FrameRenderFactory.MergeAnimations(animationCurrentFrames, parallelFrames, Contexts[index]));
+                renderedParallelAnimation.AddRange(FrameRenderFactory.MergeAnimations(animationCurrentFrames, parallelFrames, breaker, Contexts[index].RepeatOnBreak));
 
                 animationCurrentFrames = renderedParallelAnimation;
             }
@@ -69,6 +72,7 @@ namespace AceObjectionEngine.Engine.Animator.Behaviours
 
             if (Contexts[index].IsNeedReRender())
             {
+                _animatedObjects.Clear();
                 _closedRenders.Clear();
                 var rerendered = Use(0);
                 animationCurrentFrames.AddRange(rerendered);
