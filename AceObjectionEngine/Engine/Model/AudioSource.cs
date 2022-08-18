@@ -27,6 +27,7 @@ namespace AceObjectionEngine.Engine.Model
         public string Codec { get; }
         public string Format { get; }
         public long BitRate { get; }
+        public bool IsFixate { get; set; }
 
         public Stream Stream => _fileStream;
         private FileStream _fileStream;
@@ -129,7 +130,7 @@ namespace AceObjectionEngine.Engine.Model
                 })
                 .ProcessSynchronously();
             }
-            //Dispose();
+            Dispose();
 
             return new AudioSource(tempFile);
         }

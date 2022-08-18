@@ -40,7 +40,14 @@ namespace AceObjectionEngine
 
         public SceneBuilder AddAudio(Audio audio)
         {
+            audio.AudioSource.IsFixate = true;
             _frame.Objects.Add(_settings.AudioLayer, audio);
+            return this;
+        }
+
+        public SceneBuilder AddSound(Audio sound)
+        {
+            _frame.Objects.Add(_settings.AudioLayer, sound);
             return this;
         }
 

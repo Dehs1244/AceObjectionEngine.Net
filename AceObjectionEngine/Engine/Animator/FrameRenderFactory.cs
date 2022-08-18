@@ -154,6 +154,7 @@ namespace AceObjectionEngine.Engine.Animator
                     {
                         if (layerAudioSources[i].EndAnimationDuration.Ticks < 0)
                             layerAudioSources[i].EndAnimationDuration = layerAudioSources[i].EndRenderFrameDuration;
+
                         IAudioSource audioSource = await RenderLayerAudioAsync(layerAudioSources[i]);
                         AudioMixer.Mix(ref audioSource);
                         audioSource.Dispose();

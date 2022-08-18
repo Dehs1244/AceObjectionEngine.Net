@@ -21,6 +21,7 @@ namespace AceObjectionEngine.Engine.Model.Settings
         public float Volume { get; set; }
         public string AudioPath { get; set; }
         public TimeSpan StartPlay { get; set; }
+        public bool? IsFixate { get; set; }
 
         public SoundSettings()
         {

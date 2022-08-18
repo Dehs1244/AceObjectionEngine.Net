@@ -116,19 +116,19 @@ namespace AceObjectionEngine.Engine.Animator
             //Issue: Sample reading error and noise appearance
             //Solution: Direct file reading
             IAudioSource animationAudioSource = audioSource.AudioSource;
-            if (audioSource.EndAnimationDuration.Ticks > 0)
+            if (audioSource.AudioSource.IsFixate && audioSource.EndRenderFrameDuration.Ticks > 0)
             {
-                if(audioSource.EndAnimationDuration > animationAudioSource.Duration)
+                if(audioSource.EndRenderFrameDuration > animationAudioSource.Duration)
                 {
                     var series = 1;
-                    while( TimeSpan.FromTicks(animationAudioSource.Duration.Ticks * series) < audioSource.EndAnimationDuration)
+                    while(TimeSpan.FromTicks(animationAudioSource.Duration.Ticks * series) < audioSource.EndRenderFrameDuration)
                     {
                         series++;
                     }
 
                     animationAudioSource = animationAudioSource.Series(series);
                 }
-                animationAudioSource = animationAudioSource.SetDuration(audioSource.EndAnimationDuration);
+                animationAudioSource = animationAudioSource.SetDuration(audioSource.EndRenderFrameDuration);
             }
 
             await FFMpegArguments

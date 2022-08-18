@@ -24,6 +24,8 @@ namespace AceObjectionEngine.Tests.TestObjects
 
         public TimeSpan Duration => throw new NotImplementedException();
 
+        public bool IsFixate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public object Clone()
         {
             throw new NotImplementedException();

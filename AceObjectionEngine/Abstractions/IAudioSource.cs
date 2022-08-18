@@ -22,6 +22,10 @@ namespace AceObjectionEngine.Abstractions
         /// Storing and processing audio inside memory
         /// </summary>
         Stream Stream { get; }
+        /// <summary>
+        /// Responsible for audio looping
+        /// </summary>
+        bool IsFixate { get; set; }
 
         /// <summary>
         /// Audio codec
@@ -50,6 +54,7 @@ namespace AceObjectionEngine.Abstractions
         /// <param name="loopTime">Time for loop</param>
         /// <returns>New Looped Instance Of <see cref="IAudioSource"/></returns>
         IAudioSource Series(int loopTime);
+        //TODO: Volume settings
         /// <summary>
         /// Set New Duration For audio and returning a new audio
         /// If the duration is longer than original, it adds silence, if less, it cuts off

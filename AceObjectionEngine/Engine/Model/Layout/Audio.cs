@@ -41,12 +41,15 @@ namespace AceObjectionEngine.Engine.Model.Layout
             Name = settings.Name;
             Volume = settings.Volume;
             AudioSource = MediaMaker.AudioSourceMaker.Make(settings.AudioPath, settings.StartPlay);
+            AudioSource.IsFixate = settings.IsFixate ?? false;
             Size = new FileInfo(Path).Length;
         }
 
         public Audio WithSettings(SoundSettings settings)
         {
             settings.Name = settings.Name ?? Name;
+            settings.IsFixate = settings.IsFixate ?? false;
+
             if (settings.Volume == 0f) settings.Volume = Volume;
 
             return new Audio(settings);

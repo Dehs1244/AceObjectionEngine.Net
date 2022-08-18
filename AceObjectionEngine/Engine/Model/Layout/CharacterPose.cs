@@ -111,6 +111,7 @@ namespace AceObjectionEngine.Engine.Model.Layout
         {
             _playPosition = Array.FindIndex(PoseStates, (x) => x is T);
             _posesDuration -= TimeSpan.FromTicks(PoseStates.Take(_playPosition).Sum(x => x.Duration.Ticks));
+            _isPlayAudioTicks = false;
             if (_playPosition < 0) throw new IndexOutOfRangeException();
         }
     }
