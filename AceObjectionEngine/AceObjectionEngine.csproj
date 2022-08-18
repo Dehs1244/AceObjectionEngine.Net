@@ -4,7 +4,7 @@
 	  <TargetFrameworks>net462;net5.0;net6.0;netstandard2.0</TargetFrameworks>
 	  
 	  <PackageId>AceObjectionEngine.Net</PackageId>
-	  <Version>1.0.2</Version>
+	  <Version>1.0.5</Version>
 	  <Authors>Dehs</Authors>
 	  <Company>Blowout Studio</Company>
 	  <PackageTags>Animation;FFMpeg;Ace Attorney;Objection;Ace Attorney Objection;Video Animation;Video;Audio Animation</PackageTags>
@@ -20,11 +20,17 @@
 		  See the documentation in the github repository: https://github.com/Dehs1244/AceObjectionEngine.Net
 	  </Description>
 	  <PackageReleaseNotes>
-		  - Added multiple use of a single character with multiple dialogues
-		  - Fixed animation of frames
-		  - The rendering system has been changed
-		  - Fixed zero frame in rendering
-		  - Changed Pose Actions
+		  - Added support for desks
+		  - Added branching of the render
+		  - Added rendering behaviours
+		  - Added options to parallel rendering
+		  - Fixed pose animation
+		  - Fixed sounds
+		  - Added a method to the scene builder to add Custom Components
+		  - Added a method to the scene builder to add simple sounds
+		  - Added useful attributes to components
+		  - Audio Improvements
+		  - Added fixate property to audio (looping)
 	  </PackageReleaseNotes>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <RepositoryUrl>https://github.com/Dehs1244/AceObjectionEngine.Net</RepositoryUrl>
