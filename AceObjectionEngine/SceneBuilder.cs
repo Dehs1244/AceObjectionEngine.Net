@@ -51,6 +51,12 @@ namespace AceObjectionEngine
             return this;
         }
 
+        public SceneBuilder AddCustomComponent(int layer, IObjectionObject objectionObject)
+        {
+            _frame.Objects.Add(layer, objectionObject);
+            return this;
+        }
+
         public SceneBuilder AddBubble(Bubble bubble)
         {
             _frame.Objects.Add(_settings.BubbleLayer, bubble);

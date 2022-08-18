@@ -12,7 +12,7 @@
 A <b>.Net library</b> for creating scenes based on text from the <b>Ace Attorney game</b>. The library is also based on a website dedicated to creating these scenes, [Objection.Lol](Objection.lol).
 The library is based on its own animation engine for scene objects and can be extensible.
 
-Animation based on `FFMpeg` and `System.Drawings`, but you can use your own animation library.
+Animation based on `FFMpeg` and `System.Drawing`, but you can use your own animation library.
 
 ### **Don't forget about ⭐⭐⭐**
 # Getting Started
@@ -246,6 +246,53 @@ animator.SaveAsFile("ExampleObjection.mp4");
 ```
 Congratulations! The animation is ready and has been saved as a file.
 
+# Components
+## | Objection Objects
+You can create your own objects to draw them on animation. Just inherit your class from the interface `IObjectionObject`.
+```csharp
+public class CustomObjectionObjectExample : IObjectionObject
+{
+    public int Id { get; }
+    public ISpriteSource Sprite { get; }
+    public IAudioSource AudioSource { get; }
+    //The length reader of this component is used to calculate the sum of the entire animation
+    public TimeSpan DurationCounter => TimeSpan.FromSeconds(4);
+    public void Dispose()
+    {
+        //Dispose object
+    }
+    public void EndAnimation()
+    {
+        //Called when component end animation
+    }
+    public Task EndAnimationAsync()
+    {
+    }
+    public void StartAnimation()
+    {
+        //Called when component start new animation
+    }
+    public Task StartAnimationAsync()
+    {
+    }
+}
+```
+## | Branches in Rendering
+You can also create branches in the rendering for any components. For example, such branches are used to animate the **poses** of characters. You can create your **own branches** for your components or add them to existing ones.
+```csharp
+public class RenderBranchExample : IRenderBranch
+{
+    public ISpriteSource State { get; set; }
+    public TimeSpan Delay { get; set; }
+    public TimeSpan Duration => //Set duration of this branch;
+    public RenderActionConsequence Action(AnimationRenderContext sourceContext, ICollection<IAnimationObject> parallelObjects)
+    {
+        //Do things with this branch and return information about this branch to the main render
+    }
+}
+```
+As a result of the branch, you must return the data to the **main rander**: which objects should not be rendered, since this branch has already rendered them and what animation to render in the render.
+
 # Inheritance and Extension
 If you want to use your own library to analyze audio, build frames, or render, you can extend the classes of AceObjectionEngine. You can also fork the repository and make your own changes, thus replacing FFMpeg with another library.
 ## | Implementation of layer-by-layer rendering
@@ -289,6 +336,7 @@ ObjectionBuilder builder = new ObjectionBuilder(new ObjectionSettings()
     FrameRenderer = new FrameRenderImplementationExample()
 });
 ```
+
 ## | Audio Analyzer Inheritance
 The library has a **customizable audio analyzer**. FFMpeg analyzer (Probe) is used by default, but you can implement your own with abstract class `AudioAnalyzer` ***(Recommended)*** or with interface `IAudioAnalyzer`.
 
@@ -373,6 +421,8 @@ public sealed class AudioSourceImplementationExample : IAudioSource
         public long BitRate { get; }
 
         public string Format { get; }
+
+        public bool IsFixate { get; set; }
 
         public TimeSpan Duration { get; }
 
