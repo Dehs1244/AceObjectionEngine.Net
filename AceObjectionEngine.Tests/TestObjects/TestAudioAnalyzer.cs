@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,11 @@ namespace AceObjectionEngine.Tests.TestObjects
             result.Codec = "Test Codec";
 
             return result;
+        }
+
+        protected override AudioAnalysisResult AnalyzeInner(Stream stream)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -15,9 +15,12 @@ namespace AceObjectionEngine.Engine.Animator
     {
         public bool IsParallel => ParallelAttribute != null;
         public bool IsMinorObject { get; }
+        public bool IsNonRenderObject { get; }
+
         public bool IsRerenderable => AnimationObject is IRerenderable;
-        public ParallelAnimationAttribute ParallelAttribute;
-        public ParallelAnimationOptionsAttribute ParallelOptions;
+        public readonly ParallelAnimationAttribute ParallelAttribute;
+        public readonly ParallelAnimationOptionsAttribute ParallelOptions;
+        public readonly ParallelAnimationDeceptionAttribute DeceptionLayers;
 
         public IAnimationObject AnimationObject;
         public ISpriteSource Sprite => AnimationObject.Sprite;
@@ -40,6 +43,7 @@ namespace AceObjectionEngine.Engine.Animator
             AnimationObject = animationObject;
 
             ParallelAttribute = TypeHelper.GetExtensiveAttribute<ParallelAnimationAttribute>(AnimationObject);
+            DeceptionLayers = TypeHelper.GetExtensiveAttribute<ParallelAnimationDeceptionAttribute>(AnimationObject);
 
             ParallelOptions = ParallelAttribute != null
                 ? TypeHelper.GetExtensiveAttribute<ParallelAnimationOptionsAttribute>(AnimationObject) ?? ParallelAnimationOptionsAttribute.Default : null;
@@ -48,6 +52,7 @@ namespace AceObjectionEngine.Engine.Animator
             CurrentAnimationDuration = new TimeSpan();
             EndAnimationDuration = new TimeSpan();
             IsMinorObject = TypeHelper.GetExtensiveAttribute<MinorObjectAttribute>(AnimationObject) != null;
+            IsNonRenderObject = TypeHelper.GetExtensiveAttribute<NonRenderAttribute>(AnimationObject) != null;
         }
 
         public bool CanParallelRender()

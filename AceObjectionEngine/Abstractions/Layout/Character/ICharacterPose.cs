@@ -12,10 +12,10 @@ namespace AceObjectionEngine.Abstractions.Layout.Character
         string Name { get; }
         int CharacterId { get; }
         bool IsSpeedlines { get; }
-        IPoseAction ActivePoseState { get; }
+        IRenderBranch ActivePoseState { get; }
         IAudioSource[] AudioTicks { get; }
 
         bool Play();
-        void SetStartPoseState<T>() where T : IPoseAction;
+        void SetStartPoseState<T>() where T : IRenderBranch;
     }
 }

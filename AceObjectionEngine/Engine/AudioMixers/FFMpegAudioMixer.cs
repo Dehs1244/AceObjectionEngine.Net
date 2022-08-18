@@ -42,7 +42,7 @@ namespace AceObjectionEngine.Engine.AudioMixers
 
         public override void CreateTimeLine()
         {
-            FFMpegArguments.FromDeviceInput("anullsrc=channel_layout=5.1:sample_rate=48000", (options) =>
+            FFMpegHelper.FromSilenceInput((options) =>
             {
                 options.ForceFormat("lavfi");
             }).OutputToPipe(_pipe, (options) =>
@@ -81,7 +81,7 @@ namespace AceObjectionEngine.Engine.AudioMixers
 
             audioSource = audioSource.SetDuration(Duration);
             FFMpegArguments.FromFileInput(audioSource.FilePath)
-                .AddFileInput(tempForTimeStamp.FilePath)
+                .AddFileInput(tempForTimeStamp.Name)
             .OutputToPipe(new StreamPipeSink(Stream), (options) =>
             {
                 options.WithCustomArgument("-filter_complex amerge=inputs=2");

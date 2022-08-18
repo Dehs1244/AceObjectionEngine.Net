@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace AceObjectionEngine.Engine.Attributes
 {
     /// <summary>
-    /// Allows to run parallel animation of objects
+    /// Allows to run parallel animation of object
     /// </summary>
     public class ParallelAnimationAttribute : BaseInspectorAttribute
     {

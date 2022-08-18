@@ -9,7 +9,7 @@ using AceObjectionEngine.Engine.Model;
 
 namespace AceObjectionEngine.Engine.PoseActions
 {
-    public class SpeakingPoseAction : IPoseAction
+    public class SpeakingPoseAction : IRenderBranch
     {
         public ISpriteSource State { get; set; }
         public TimeSpan Delay { get; set; }

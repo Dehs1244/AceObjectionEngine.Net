@@ -10,6 +10,7 @@ using AceObjectionEngine.Engine.Enums;
 namespace AceObjectionEngine.Abstractions.Layout.Character
 {
     [ParallelAnimationOptions(AnimationStateBreaker.Origin)]
+    [ParallelAnimationDeception(typeof(IChatBox))]
     public interface ICharacter : IObjectionObject, IRenderInvokable
     {
         string Name { get; }

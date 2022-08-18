@@ -10,13 +10,13 @@ using AceObjectionEngine.Extensions;
 
 namespace AceObjectionEngine.Engine.PoseActions
 {
-    public class SimplePoseAction : IPoseAction
+    public class SimplePoseAction : IRenderBranch
     {
         public ISpriteSource State { get; set; }
         public TimeSpan Delay { get; set; }
         public TimeSpan Duration => State.Duration;
 
-        RenderActionConsequence IPoseAction.Action(AnimationRenderContext sourceContext, ICollection<IAnimationObject> parallelObjects)
+        RenderActionConsequence IRenderBranch.Action(AnimationRenderContext sourceContext, ICollection<IAnimationObject> parallelObjects)
             => new RenderActionConsequence(State.AnimateFrames().WithDelay(Delay, State.DelayMode));
     }
 }

@@ -16,6 +16,12 @@ namespace AceObjectionEngine.Abstractions
         /// </summary>
         IAudioMixer AudioMixer { get; }
         /// <summary>
+        /// Method of animating objects on the frame
+        /// Recreated with each layer rendering
+        /// </summary>
+        //IAnimationBehaviour Behaviour { get; set; }
+
+        /// <summary>
         /// Render All Animation Objects from a Layer to single frame
         /// </summary>
         /// <param name="layerSprites">Animation Objects from processed layer</param>

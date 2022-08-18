@@ -8,10 +8,22 @@ using System.Threading.Tasks;
 
 namespace AceObjectionEngine.Abstractions.Layout
 {
+    /// <summary>
+    /// Implementation interface of chatbox
+    /// </summary>
     public interface IChatBox : IObjectionObject
     {
+        /// <summary>
+        /// Chatbox binding
+        /// </summary>
         ChatBoxAlign Align { get; }
+        /// <summary>
+        /// The character that attached to chatbox
+        /// </summary>
         ICharacter ReferenceCharacter { get; }
+        /// <summary>
+        /// Text of chatbox
+        /// </summary>
         string Text { get; }
     }
 }

@@ -8,6 +8,7 @@ using AceObjectionEngine.Engine.Collections;
 using AceObjectionEngine.Helpers;
 using AceObjectionEngine.Engine.AudioMixers;
 using AceObjectionEngine.Engine.Model;
+using AceObjectionEngine.Engine.Animator.Behaviours;
 
 namespace AceObjectionEngine.Engine.Animator
 {
@@ -20,8 +21,8 @@ namespace AceObjectionEngine.Engine.Animator
 
         public int SpriteIteration { get; set; }
         public int AudioSourceIteration { get; set; }
-        protected TimeSpan TimeLineAnimationDuration { get; set; }
-        protected TimeSpan TimeLineRenderDuration { get; set; }
+        public TimeSpan TimeLineAnimationDuration { get; set; }
+        public TimeSpan TimeLineRenderDuration { get; set; }
 
         public IAudioMixer AudioMixer { get; protected set; }
 
@@ -46,53 +47,11 @@ namespace AceObjectionEngine.Engine.Animator
         public virtual void RenderAudio(AnimationRenderContext[] layerAudioSources) => RenderAudioAsync(layerAudioSources).GetAwaiter().GetResult();
         public virtual void RenderSprite(AnimationRenderContext[] layerSprites) => RenderSpriteAsync(layerSprites).GetAwaiter().GetResult();
 
-        public ISpriteSource[] UseParallelAnimation(AnimationRenderContext[] layerCollection, int index, out int skipRenders)
-        {
-            List<ISpriteSource> animationCurrentFrames = new List<ISpriteSource>();
-
-            var renderInvoke = layerCollection[index].InvokeOnRender(layerCollection[index], layerCollection.Select(x => x.AnimationObject).ToList());
-            if (renderInvoke.IsAction) animationCurrentFrames = renderInvoke.Animation.ToList();
-            else animationCurrentFrames = layerCollection[index].Sprite.AnimateFrames().ToList();
-
-            skipRenders = index;
-
-            if (index + 1 < layerCollection.Count() &&
-                layerCollection[index].CanParallelRender())
-            {
-                var parallelFrames = UseParallelAnimation(layerCollection, index + 1, out skipRenders);
-                List<ISpriteSource> renderedParallelAnimation = new List<ISpriteSource>();
-
-                renderedParallelAnimation.AddRange(MergeAnimations(animationCurrentFrames, parallelFrames, layerCollection[index]));
-
-                animationCurrentFrames = renderedParallelAnimation;
-            }
-
-            if (layerCollection[index].AudioTicks.Count() > 0)
-                RenderAudio(EnumerableHelper.ToEnumerable(layerCollection[index]).ToArray());
-
-            layerCollection[index].AnimationObject.EndAnimation();
-
-            if (layerCollection[index].IsRerenderable) AddTime(Frame.CalculateDuration(animationCurrentFrames.Count()));
-
-            if (layerCollection[index].IsNeedReRender())
-            {
-                var rerendered = UseParallelAnimation(layerCollection, 0, out int _);
-                animationCurrentFrames.AddRange(rerendered);
-            }
-
-
-            layerCollection[index].CurrentAnimationDuration = TimeLineAnimationDuration;
-            layerCollection[index].CurrentRenderFrameDuration = TimeLineRenderDuration;
-            layerCollection[index].EndAnimationDuration = layerCollection[index].AnimationObject.Sprite.Duration;
-            if (layerCollection[index].AudioSource != null)
-                RenderAudio(EnumerableHelper.ToEnumerable(layerCollection[index]).ToArray());
-
-            //animationCurrentFrames.AddRange(UseParallelAnimation(layerCollection, index + 1));
-            return animationCurrentFrames.ToArray();
-        }
-
         public static IList<ISpriteSource> MergeAnimations(IList<ISpriteSource> firstFrames, IList<ISpriteSource> secondFrames, AnimationRenderContext context)
         {
+            if (!firstFrames.Any()) return secondFrames;
+            if (!secondFrames.Any()) return firstFrames;
+
             IList<ISpriteSource> renderedParallelAnimation = new List<ISpriteSource>();
             var firstFrameIteration = 0;
             var secondFrameIteration = 0;
@@ -136,6 +95,8 @@ namespace AceObjectionEngine.Engine.Animator
             await Task.Run(async () =>
             {
                 RenderedSprites.StartIteration(SpriteIteration);
+                var behaviour = new ParallelRenderingBehaviour(this, layerSprites);
+
                 ISpriteSource result = new Sprite(new System.Drawing.Bitmap(layerSprites.First().Sprite.Width, layerSprites.First().Sprite.Height));
                 bool usedParallelRender = false;
                 int toSkipRenders = 0;
@@ -146,10 +107,10 @@ namespace AceObjectionEngine.Engine.Animator
 
                 for (var i = 0; i < layerSprites.Count(); i++)
                 {
-                    toSkipRenders = i;
                     usedParallelRender = false;
 
-                    var animated = UseParallelAnimation(layerSprites, i, out toSkipRenders);
+                    var animated = behaviour.Use(i);
+                    toSkipRenders = behaviour.RendersToSkip;
                     //if (layerSprites[i].CanParallelRender()) nextRenderSkip = true;
                     usedParallelRender = true;
                     ISpriteSource coreAnimationFrame = (ISpriteSource)result.Clone();

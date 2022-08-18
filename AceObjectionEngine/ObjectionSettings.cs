@@ -13,7 +13,8 @@ namespace AceObjectionEngine
         public int AudioLayer { get; set; } = 0;
         public int BackgroundLayer { get; set; } = 1;
         public int CharacterLayer { get; set; } = 2;
-        public int DialogueLayer { get; set; } = 3;
+        public int DeskLayer { get; set; } = 3;
+        public int DialogueLayer { get; set; } = 4;
         public int BubbleLayer { get; set; } = 10;
 
         public int Width { get; set; } = 960;
@@ -25,7 +26,8 @@ namespace AceObjectionEngine
             AudioLayer = 0,
             BackgroundLayer = 1,
             CharacterLayer = 2,
-            DialogueLayer = 3,
+            DeskLayer = 3,
+            DialogueLayer = 4,
             BubbleLayer = 10,
             FrameRenderer = null,
             Width = 960,

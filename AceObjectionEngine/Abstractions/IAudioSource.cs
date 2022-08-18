@@ -10,11 +10,26 @@ namespace AceObjectionEngine.Abstractions
 {
     public interface IAudioSource : ICloneable, IDisposable, IAnimationMedia
     {
+        /// <summary>
+        /// Offsets from the beginning of audio playback
+        /// </summary>
         TimeSpan Offset { get; }
+        /// <summary>
+        /// Path to file of Audio
+        /// </summary>
         string FilePath { get; }
+        /// <summary>
+        /// Storing and processing audio inside memory
+        /// </summary>
         Stream Stream { get; }
 
+        /// <summary>
+        /// Audio codec
+        /// </summary>
         string Codec { get; }
+        /// <summary>
+        /// BitRate of Audio
+        /// </summary>
         long BitRate { get; }
 
         /// <summary>
@@ -42,6 +57,10 @@ namespace AceObjectionEngine.Abstractions
         /// <param name="duration">New audio duration</param>
         /// <returns>New Instance Of <see cref="IAudioSource"/> with new duration</returns>
         IAudioSource SetDuration(TimeSpan duration);
+        /// <summary>
+        /// Save audio as file
+        /// </summary>
+        /// <param name="path"></param>
         void Save(string path);
     }
 }

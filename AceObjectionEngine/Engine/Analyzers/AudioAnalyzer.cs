@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -28,14 +29,30 @@ namespace AceObjectionEngine.Engine.Analyzers
 
         public AudioAnalysisResult Analyze(string filePath)
         {
-            if (TryAnalyze(filePath, out AudioAnalysisResult result)) return result;
+            if (TryAnalyze(() => AnalyzeInner(filePath), out AudioAnalysisResult result)) return result;
 
-            throw new ObjectionVisorObjectException<IAudioSource>();
+            throw new ObjectionVisorObjectException<IAudioSource>(filePath);
         }
 
         public async Task<AudioAnalysisResult> AnalyzeAsync(string filePath, CancellationToken token = default)
         {
-            var tryingResult = await TryAnalyzeAsync(filePath, token);
+            var tryingResult = await TryAnalyzeAsync(async () => await AnalyzeInnerAsync(filePath));
+
+            if (tryingResult.IsSuccesfull) return tryingResult.result;
+
+            throw new ObjectionVisorObjectException<IAudioSource>(filePath);
+        }
+
+        public AudioAnalysisResult Analyze(Stream stream)
+        {
+            if (TryAnalyze(() => AnalyzeInner(stream), out AudioAnalysisResult result)) return result;
+
+            throw new ObjectionVisorObjectException<IAudioSource>();
+        }
+
+        public async Task<AudioAnalysisResult> AnalyzeAsync(Stream stream, CancellationToken token = default)
+        {
+            var tryingResult = await TryAnalyzeAsync(async () => await AnalyzeInnerAsync(stream, token));
 
             if (tryingResult.IsSuccesfull) return tryingResult.result;
 
@@ -43,13 +60,21 @@ namespace AceObjectionEngine.Engine.Analyzers
         }
 
         /// <summary>
-        /// Called when trying to analyze input audio
+        /// Called when trying to analyze input audio from file
         /// </summary>
         /// <param name="filePath">Path to audio</param>
         /// <returns>Audio Analyze Result</returns>
         protected abstract AudioAnalysisResult AnalyzeInner(string filePath);
         protected virtual Task<AudioAnalysisResult> AnalyzeInnerAsync(string filePath, CancellationToken token = default) => 
             Task.Run(() => AnalyzeInner(filePath), token);
+        /// <summary>
+        /// Called when trying to analyze input audio from stream
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        protected abstract AudioAnalysisResult AnalyzeInner(Stream stream);
+        protected virtual Task<AudioAnalysisResult> AnalyzeInnerAsync(Stream stream, CancellationToken token = default) =>
+            Task.Run(() => AnalyzeInner(stream), token);
 
         /// <summary>
         /// Try Analyze input Audio without exception
@@ -57,7 +82,7 @@ namespace AceObjectionEngine.Engine.Analyzers
         /// <param name="filePath">Path to audio</param>
         /// <param name="analyze">When true analyzed audio result or null</param>
         /// <returns>Result of an attempt to analyze audio</returns>
-        public bool TryAnalyze(string filePath, out AudioAnalysisResult analyze)
+        public bool TryAnalyze(Func<AudioAnalysisResult> analysing, out AudioAnalysisResult analyze)
         {
             analyze = null;
 
@@ -67,7 +92,7 @@ namespace AceObjectionEngine.Engine.Analyzers
             {
                 try
                 {
-                    analyze = AnalyzeInner(filePath);
+                    analyze = analysing();
                     isAnalyzed = true;
                     break;
                 }
@@ -80,7 +105,7 @@ namespace AceObjectionEngine.Engine.Analyzers
             return isAnalyzed;
         }
 
-        public async Task<(bool IsSuccesfull, AudioAnalysisResult result)> TryAnalyzeAsync(string filePath, CancellationToken token)
+        public async Task<(bool IsSuccesfull, AudioAnalysisResult result)> TryAnalyzeAsync(Func<Task<AudioAnalysisResult>> analysing)
         {
             AudioAnalysisResult analyze = null;
 
@@ -90,7 +115,7 @@ namespace AceObjectionEngine.Engine.Analyzers
             {
                 try
                 {
-                    analyze = await AnalyzeAsync(filePath);
+                    analyze = await analysing();
                     isAnalyzed = true;
                     break;
                 }

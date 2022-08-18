@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -14,10 +15,16 @@ namespace AceObjectionEngine.Abstractions.Async
     public interface IAudioAnalyzerAsync
     {
         /// <summary>
-        ///  Asynchronously analyzes input audio
+        ///  Asynchronously analyzes input audio from stream
         /// </summary>
         /// <param name="filePath">Path to audio</param>
         /// <returns>Task of Audio Analyze Data</returns>
         Task<AudioAnalysisResult> AnalyzeAsync(string filePath, CancellationToken token = default);
+        /// <summary>
+        ///  Asynchronously analyzes input audio from stream
+        /// </summary>
+        /// <param name="filePath">Audio Stream</param>
+        /// <returns>Task of Audio Analyze Data</returns>
+        Task<AudioAnalysisResult> AnalyzeAsync(Stream stream, CancellationToken token = default);
     }
 }

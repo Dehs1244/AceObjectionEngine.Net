@@ -23,7 +23,7 @@ namespace AceObjectionEngine.Engine.Model.Settings
         public string IdleImagePath { get; set; }
         public string SpeakImagePath { get; set; }
         public Audio[] AudioTicks { get; set; }
-        public IPoseAction[] PoseStates { get; set; } = Array.Empty<IPoseAction>();
+        public IRenderBranch[] PoseStates { get; set; } = Array.Empty<IRenderBranch>();
 
         public CharacterPoseSettings(AssetJson json) : base(json)
         {
@@ -57,7 +57,7 @@ namespace AceObjectionEngine.Engine.Model.Settings
                     StartPlay = TimeSpan.FromMilliseconds(Frame.SamplingFromObjectionLolTime((double)assetAudio["time"]))
                 }));
             }
-            var poseState = new List<IPoseAction>();
+            var poseState = new List<IRenderBranch>();
 
             foreach(var assetPoseState in json["states"])
             {

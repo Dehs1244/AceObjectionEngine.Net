@@ -46,7 +46,6 @@ namespace AceObjectionEngine.Engine.Model.Layout
 
         public Audio WithSettings(SoundSettings settings)
         {
-            settings.AudioPath = settings.AudioPath ?? AudioSource.FilePath;
             settings.Name = settings.Name ?? Name;
             if (settings.Volume == 0f) settings.Volume = Volume;
 

@@ -34,6 +34,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Abstractions\IAnimationObject.cs~RFb35d08b.TMP" />
     <None Remove="Engine\Model\PoseActionResult.cs~RFc70955b.TMP" />
   </ItemGroup>
 

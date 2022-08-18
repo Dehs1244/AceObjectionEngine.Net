@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace AceObjectionEngine.Abstractions
 {
-    public interface IObjectionAction
+    /// <summary>
+    /// Implements methods for animating objects on a frame
+    /// </summary>
+    public interface IAnimationBehaviour
     {
+        ISpriteSource[] Use(int index);
     }
 }

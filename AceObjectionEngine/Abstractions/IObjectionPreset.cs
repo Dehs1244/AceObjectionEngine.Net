@@ -9,6 +9,10 @@ namespace AceObjectionEngine.Abstractions
 {
     public interface IObjectionPreset : IObjectionPresetAsync
     {
+        /// <summary>
+        /// Load preset
+        /// </summary>
+        /// <returns>Loaded Animation Object</returns>
         IObjectionObject Load();
     }
 }

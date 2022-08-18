@@ -34,6 +34,7 @@ namespace AceObjectionEngine
         public SceneBuilder AddBackground(Background background)
         {
             _frame.Objects.Add(_settings.BackgroundLayer, background);
+            if (background.Desk != null) _frame.Objects.Add(_settings.DeskLayer, background.Desk);
             return this;
         }
 

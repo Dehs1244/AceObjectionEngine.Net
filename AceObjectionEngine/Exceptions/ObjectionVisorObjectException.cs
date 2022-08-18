@@ -9,12 +9,12 @@ namespace AceObjectionEngine.Exceptions
 {
     public class ObjectionVisorObjectException<T> : ObjectionException
     {
-        public ObjectionVisorObjectException() : base($"Object {nameof(T)} can not be loaded, because it has invalid data")
+        public ObjectionVisorObjectException() : base($"Object {typeof(T).Name} can not be loaded, because it has invalid data")
         {
 
         }
 
-        public ObjectionVisorObjectException(string path) : base($"Object {nameof(T)} can not be loaded, because it has invalid data. Path: " + $@"{path}")
+        public ObjectionVisorObjectException(string path) : base($"Object {typeof(T).Name} can not be loaded, because it has invalid data. Path: " + $@"{path}")
         {
 
         }

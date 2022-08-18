@@ -27,6 +27,12 @@ namespace AceObjectionEngine.Helpers
             return tempPath;
         }
 
+        public void WriteContent(string content)
+        {
+            byte[] buffer = Encoding.Default.GetBytes(content);
+            Write(buffer, 0, buffer.Length);
+        }
+
         public new void Dispose()
         {
             base.Dispose();

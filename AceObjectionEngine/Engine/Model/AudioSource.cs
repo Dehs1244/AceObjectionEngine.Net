@@ -58,7 +58,7 @@ namespace AceObjectionEngine.Engine.Model
 
         public object Clone() => new AudioSource((FileStream)Stream, Offset);
 
-        public static AudioSource FromFile(string path, TimeSpan offset) => new AudioSource(File.OpenRead(path), offset); 
+        public static AudioSource FromFile(string path, TimeSpan offset) => new AudioSource(File.OpenRead(path), offset);
         public static AudioSource FromFile(string path) => new AudioSource(File.OpenRead(path));
 
         public void Serialize(Stream stream)
@@ -109,7 +109,7 @@ namespace AceObjectionEngine.Engine.Model
 
             var tempFile = new TempFileStream("OBJECTION-DURATION-CHANGED-AUDIO.mp3");
             tempFile.Close();
-            if(duration > Duration)
+            if (duration > Duration)
             {
                 FFMpegArguments
                 .FromFileInput(FilePath)
@@ -129,7 +129,7 @@ namespace AceObjectionEngine.Engine.Model
                 })
                 .ProcessSynchronously();
             }
-            Dispose();
+            //Dispose();
 
             return new AudioSource(tempFile);
         }
@@ -137,36 +137,36 @@ namespace AceObjectionEngine.Engine.Model
         public IAudioSource Mix(IEnumerable<IAudioSource> audioSources)
         {
             throw new NotImplementedException();
-         //   if (!audioSources.Any()) return this;
+            //   if (!audioSources.Any()) return this;
 
-         //   var tempFile = new TempFileStream("OBJECTION-MIXED-AUDIO.mp3");
-         //   tempFile.Close();
-         //   var ffmpegFactory = FFMpegArguments
-         //       .FromFileInput(FilePath);
-         //   StringBuilder mixerArgumentBuilder = new StringBuilder();
-         //   string[] alphabet = Enumerable.Range('b', 25).Select(x=> x.ToString().ToLower()).Select(x => x).ToArray(); 
-         //   for(var i = 0; i < audioSources.Count(); i++)
-         //   {
-         //       var audio = audioSources.ElementAt(i);
-         //       ffmpegFactory.AddFileInput(audio.FilePath);
-         //       mixerArgumentBuilder.AppendLine($"[{i}]adelay={audio.Offset.TotalMilliseconds}|{audio.Offset.TotalMilliseconds}[{alphabet[i]}];");
-         //   }
+            //   var tempFile = new TempFileStream("OBJECTION-MIXED-AUDIO.mp3");
+            //   tempFile.Close();
+            //   var ffmpegFactory = FFMpegArguments
+            //       .FromFileInput(FilePath);
+            //   StringBuilder mixerArgumentBuilder = new StringBuilder();
+            //   string[] alphabet = Enumerable.Range('b', 25).Select(x=> x.ToString().ToLower()).Select(x => x).ToArray(); 
+            //   for(var i = 0; i < audioSources.Count(); i++)
+            //   {
+            //       var audio = audioSources.ElementAt(i);
+            //       ffmpegFactory.AddFileInput(audio.FilePath);
+            //       mixerArgumentBuilder.AppendLine($"[{i}]adelay={audio.Offset.TotalMilliseconds}|{audio.Offset.TotalMilliseconds}[{alphabet[i]}];");
+            //   }
 
-         //   ffmpegFactory.OutputToFile(tempFile.FilePath, true, options =>
-         //   {
-         //       options.WithCustomArgument(@"-filter_complex
-         //""[1]adelay=184000|184000[b];
-         // [2]adelay=360000|360000[c];
-         //   [3]adelay=962000|962000[d];
-         //   [0][b][c][d]amix=4""");
-         //   });
-         //   Dispose();
+            //   ffmpegFactory.OutputToFile(tempFile.FilePath, true, options =>
+            //   {
+            //       options.WithCustomArgument(@"-filter_complex
+            //""[1]adelay=184000|184000[b];
+            // [2]adelay=360000|360000[c];
+            //   [3]adelay=962000|962000[d];
+            //   [0][b][c][d]amix=4""");
+            //   });
+            //   Dispose();
 
-         //   foreach(var audio in audioSources)
-         //   {
-         //       audio.Dispose();
-         //   }
-         //   return new AudioSource(tempFile, 0);
+            //   foreach(var audio in audioSources)
+            //   {
+            //       audio.Dispose();
+            //   }
+            //   return new AudioSource(tempFile, 0);
         }
 
         public void Dispose()

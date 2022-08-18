@@ -11,7 +11,7 @@ using AceObjectionEngine.Engine.Model;
 
 namespace AceObjectionEngine.Engine.PoseActions
 {
-    public class IdleWithChatBoxPoseAction : IPoseAction
+    public class IdleWithChatBoxPoseAction : IRenderBranch
     {
         public ISpriteSource State { get; set; }
         public TimeSpan Delay { get; set; }
@@ -20,12 +20,20 @@ namespace AceObjectionEngine.Engine.PoseActions
         public RenderActionConsequence Action(AnimationRenderContext sourceContext, ICollection<IAnimationObject> parallelObjects)
         {
             var chatBoxes = parallelObjects.Where(x => x is IChatBox);
+            var desks = parallelObjects.Where(x => x is IDesk);
             if (chatBoxes.Any())
             {
                 var chatBox = chatBoxes.Cast<IChatBox>().First();
+                var sourceAnimated = sourceContext.Sprite.AnimateFrames();
+                if (desks.Any()) sourceAnimated = FrameRenderFactory.MergeAnimations(sourceAnimated, desks.First().Sprite.AnimateFrames(), sourceContext).ToArray();
+
                 var animatedFrame = chatBox.Sprite.AnimateFrames().Last();
                 animatedFrame.Delay = TimeSpan.FromSeconds(3);
-                return new RenderActionConsequence(FrameRenderFactory.MergeAnimations(sourceContext.Sprite.AnimateFrames(), animatedFrame.AnimateFrames(), sourceContext));
+
+                var consequence = desks.Any() ?
+                    new RenderActionConsequence(FrameRenderFactory.MergeAnimations(sourceAnimated, animatedFrame.AnimateFrames(), sourceContext), desks.First()) :
+                    new RenderActionConsequence(FrameRenderFactory.MergeAnimations(sourceAnimated, animatedFrame.AnimateFrames(), sourceContext));
+                return consequence;
             }
 
             return RenderActionConsequence.FromEmpty();

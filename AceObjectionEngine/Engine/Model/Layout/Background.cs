@@ -22,7 +22,7 @@ namespace AceObjectionEngine.Engine.Model.Layout
         public TimeSpan DurationCounter => TimeSpan.Zero;
 
         public ISpriteSource Sprite { get; }
-        public ISpriteSource DeskSprite;
+        public Desk Desk { get; }
         public string ImagePath { get; }
         public string ImageDeskPath { get; }
 
@@ -42,7 +42,11 @@ namespace AceObjectionEngine.Engine.Model.Layout
             Name = settings.Name;
             ImagePath = settings.ImagePath;
             ImageDeskPath = settings.ImageDeskPath;
-            if(settings.ImageDeskPath != null) DeskSprite = MediaMaker.SpriteMaker.Make(settings.ImageDeskPath);
+            if (settings.ImageDeskPath != null) Desk = new Desk(new DeskSettings()
+            {
+                ImagePath = settings.ImageDeskPath
+            });
+
             IsWide = settings.IsWide;
         }
 
@@ -58,7 +62,6 @@ namespace AceObjectionEngine.Engine.Model.Layout
         public void Dispose()
         {
             Sprite?.Dispose();
-            DeskSprite?.Dispose();
         }
 
         public void EndAnimation()
