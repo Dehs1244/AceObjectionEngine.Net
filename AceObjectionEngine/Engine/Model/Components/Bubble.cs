@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Settings;
 using AceObjectionEngine.Loader.Presets;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Engine.Attributes;
 using AceObjectionEngine.Engine.Infrastructure;
 using System.Drawing;
 
-namespace AceObjectionEngine.Engine.Model.Layout
+namespace AceObjectionEngine.Engine.Model.Components
 {
     [MinorObject]
-    public class Bubble : IObjectionObject
+    public class Bubble : IObjectionObject, IFloatyLayerIndex
     {
         public int Id { get; }
         public string Name { get; }
@@ -25,6 +25,12 @@ namespace AceObjectionEngine.Engine.Model.Layout
 
         private ISpriteSource _sourceBublleSprite;
         public IAudioSource AudioSource { get; }
+
+        public SingleEntry<int> LayerIndexer { get; set; }
+
+        public SingleEntry<int> EndLayerIndexer { get; set; }
+
+        public Type[] DependencyIndexer => Array.Empty<Type>();
 
         public Bubble(IObjectionSettings<Bubble> settings)
         {

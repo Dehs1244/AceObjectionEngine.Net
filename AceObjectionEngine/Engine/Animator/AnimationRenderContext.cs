@@ -17,6 +17,10 @@ namespace AceObjectionEngine.Engine.Animator
         public bool IsMinorObject { get; }
         public bool IsNonRenderObject { get; }
 
+        public int StartLayerIndex => LayerIndexer.LayerIndexer;
+        public bool IsDependentOnLayerIndex => LayerIndexer != null;
+        public IFloatyLayerIndex LayerIndexer { get; }
+
         public bool IsRerenderable => AnimationObject is IRerenderable;
         public readonly ParallelAnimationAttribute ParallelAttribute;
         public readonly ParallelAnimationOptionsAttribute ParallelOptions;
@@ -44,6 +48,12 @@ namespace AceObjectionEngine.Engine.Animator
 
             ParallelAttribute = TypeHelper.GetExtensiveAttribute<ParallelAnimationAttribute>(AnimationObject);
             DeceptionLayers = TypeHelper.GetExtensiveAttribute<ParallelAnimationDeceptionAttribute>(AnimationObject);
+            LayerIndexer = null;
+
+            if (animationObject is IFloatyLayerIndex floatyIndexer)
+            {
+                LayerIndexer = floatyIndexer;
+            }
 
             ParallelOptions = ParallelAttribute != null
                 ? TypeHelper.GetExtensiveAttribute<ParallelAnimationOptionsAttribute>(AnimationObject) ?? ParallelAnimationOptionsAttribute.Default : null;

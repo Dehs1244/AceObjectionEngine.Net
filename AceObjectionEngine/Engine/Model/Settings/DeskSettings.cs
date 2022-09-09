@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AceObjectionEngine.Engine.Model.Layout;
+using AceObjectionEngine.Engine.Model.Components;
 using AceObjectionEngine.Loader.Utils;
 
-namespace AceObjectionEngine.Engine.Model.Settings
+namespace AceObjectionEngine.Settings
 {
     public class DeskSettings : BaseSettings<Desk>
     {

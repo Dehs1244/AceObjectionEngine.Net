@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Abstractions.Layout.Character;
 using AceObjectionEngine.Engine.Animator;
-using AceObjectionEngine.Engine.Model.Layout;
+using AceObjectionEngine.Engine.Model.Components;
+using AceObjectionEngine.Engine.Model;
 
 namespace AceObjectionEngine
 {
@@ -14,6 +15,7 @@ namespace AceObjectionEngine
     {
         private IAnimator<Frame> _animator;
         private ObjectionSettings _settings;
+        private TimeSpan _currentBuildDuration;
 
         public ObjectionBuilder(ObjectionSettings settings = null)
         {
@@ -26,6 +28,32 @@ namespace AceObjectionEngine
             SceneBuilder scene = new SceneBuilder(_settings);
             creation(scene);
             _animator.Hierarchy.Add(scene.Build());
+            return this;
+        }
+
+        public ObjectionBuilder AddGlobalAudio(Audio audio)
+        {
+            _animator.GlobalAudio.Add(new AceAudioTrackContainer(audio.AudioSource)
+            {
+                Start = _currentBuildDuration
+            });
+            return this;
+        }
+
+        public ObjectionBuilder RefreshGlobalAudio()
+        {
+            if (!_animator.Hierarchy.Any()) return this;
+
+            var lastFrame = _animator.Hierarchy.Last();
+
+            foreach(var track in _animator.GlobalAudio)
+            {
+                track.End = lastFrame.Duration;
+            }
+
+            lastFrame.ResetAudioGlobalTrack = true;
+            _currentBuildDuration = lastFrame.Duration;
+
             return this;
         }
 

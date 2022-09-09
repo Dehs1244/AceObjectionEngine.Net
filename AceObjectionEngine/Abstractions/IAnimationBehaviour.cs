@@ -12,5 +12,6 @@ namespace AceObjectionEngine.Abstractions
     public interface IAnimationBehaviour
     {
         ISpriteSource[] Use(int index);
+        Task<ISpriteSource[]> UseAsync(int index);
     }
 }

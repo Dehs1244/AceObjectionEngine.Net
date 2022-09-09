@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Loader.Presets;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Settings;
 using System.IO;
 using AceObjectionEngine.Loader.Utils;
 using Newtonsoft.Json.Linq;
 using AceObjectionEngine.Engine.Infrastructure;
 
-namespace AceObjectionEngine.Engine.Model.Layout
+namespace AceObjectionEngine.Engine.Model.Components
 {
     public sealed class Audio : IObjectionObject
     {

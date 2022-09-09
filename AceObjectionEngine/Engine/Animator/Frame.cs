@@ -12,7 +12,8 @@ using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Engine.Collections;
 using AceObjectionEngine.Engine.Model;
-using AceObjectionEngine.Engine.Model.Layout;
+using AceObjectionEngine.Engine.Model.Components;
+using AceObjectionEngine.Exceptions;
 using FFMpegCore.Pipes;
 
 namespace AceObjectionEngine.Engine.Animator
@@ -24,11 +25,14 @@ namespace AceObjectionEngine.Engine.Animator
         public static int FrameCountFromDuration(TimeSpan duration) => (int)Math.Round(duration.TotalSeconds * ((double)ObjectionAnimator.FrameRate)); 
 
         public AnimatorLayersCollection<Frame> Objects { get; }
+        public TimeSpan Offset { get; set; }
+
         public TimeSpan Duration => TimeSpan.FromTicks(Objects.AsAnimationObjectEnumerable().Where(x=> x != null)
-                .Sum(x => x.DurationCounter.Ticks));
+                .Sum(x => x.DurationCounter.Ticks) + Offset.Ticks);
 
         public int Updater { get; private set; }
         public int ReadingLayer { get; private set; }
+        public bool ResetAudioGlobalTrack { get; set; }
 
         public Frame()
         {
@@ -38,6 +42,31 @@ namespace AceObjectionEngine.Engine.Animator
         public void Add(int layer, IAnimationObject animateObject)
         {
             Objects[layer].Add(animateObject);
+        }
+
+        public bool IsAlreadyReaded<T>() where T : IAnimationObject
+        {
+            var index = Objects.FindLayerWithObjects<T>();
+            if (index == -1) throw new ObjectionException("Layer with this object missing");
+
+            return Updater > Objects[index].Count;
+        }
+
+        public bool IsAlreadyReaded(Type objectType, int indexer)
+        {
+            var index = Objects.FindLayerWithObjects(objectType);
+            if (index == -1) throw new ObjectionException("Layer with this object missing");
+
+            return Objects[index].MaximumReadedIterator > indexer;
+        }
+
+        private bool _CanIndexerRender(IFloatyLayerIndex indexer)
+        {
+            foreach(var dependency in indexer.DependencyIndexer)
+            {
+                if (IsAlreadyReaded(dependency, indexer.LayerIndexer)) return false;
+            }
+            return true;
         }
 
         private AnimationRenderContext? _ReadExtensiveLayer(int updater, int readingLayer, bool ignoreMinorsObjects = true)
@@ -52,7 +81,21 @@ namespace AceObjectionEngine.Engine.Animator
                     if (!context.IsMinorObject || ignoreMinorsObjects)
                     {
                         context.EndRenderFrameDuration = Duration;
-                        return context;
+                        Objects[readingLayer].MaximumReadedIterator = readUpdating;
+                        if (context.IsDependentOnLayerIndex)
+                        {
+                            if (Updater >= context.StartLayerIndex)
+                            {
+                                if (_CanIndexerRender(context.LayerIndexer))
+                                {
+                                    return context;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return context;
+                        }
                     }
                 }
             if ((readUpdating - 1) >= 0) return _ReadExtensiveLayer(readUpdating, readingLayer, false);

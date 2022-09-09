@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
+using AceObjectionEngine.Engine.Attributes;
+using AceObjectionEngine.Helpers;
 
 namespace AceObjectionEngine.Engine.Collections
 {
@@ -32,6 +34,8 @@ namespace AceObjectionEngine.Engine.Collections
 
         object IEnumerator.Current => Current;
 
+        private int _layerIndexer = 0;
+
         public AnimatorLayersCollection(T parent)
         {
             Parent = parent;
@@ -52,6 +56,10 @@ namespace AceObjectionEngine.Engine.Collections
 
         public void Add(int layer, IAnimationObject value)
         {
+            if (value != null && TypeHelper.GetExtensiveAttribute<FloatyIndexInvoker>(value) != null) _layerIndexer++;
+
+            if (value is IFloatyLayerIndex objectLayerIndexer) objectLayerIndexer.LayerIndexer = _layerIndexer;
+
             if (_dict.ContainsKey(layer))
             {
                 _dict[layer].Add(value);
@@ -59,6 +67,20 @@ namespace AceObjectionEngine.Engine.Collections
             }
             AddSimpleLayer(layer);
             Add(layer, value);
+        }
+
+        public int FindLayerWithObjects<TObject>() where TObject : IAnimationObject
+        {
+            var layer = _dict.Where(x => x.Value.Any(y => y is TObject));
+
+            return layer.Any() ? layer.First().Key : -1;
+        }
+
+        public int FindLayerWithObjects(Type objectType)
+        {
+            var layer = _dict.Where(x => x.Value.Any(y => TypeHelper.AreSame(y.GetType(), objectType)));
+
+            return layer.Any() ? layer.First().Key : -1;
         }
 
         public bool Any(Func<KeyValuePair<int, AnimatorObjectsCollection<T>>, bool> predicate) => 

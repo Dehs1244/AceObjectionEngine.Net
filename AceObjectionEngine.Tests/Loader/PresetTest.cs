@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using AceObjectionEngine.Loader.Presets;
-using AceObjectionEngine.Engine.Model.Layout;
+using AceObjectionEngine.Engine.Model.Components;
 
 namespace AceObjectionEngine.Tests.Loader
 {

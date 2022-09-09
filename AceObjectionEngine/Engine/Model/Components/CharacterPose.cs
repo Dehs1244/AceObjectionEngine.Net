@@ -6,13 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Abstractions.Layout.Character;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Settings;
 using AceObjectionEngine.Loader.Presets;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Engine.PoseActions;
 using AceObjectionEngine.Engine.Infrastructure;
 
-namespace AceObjectionEngine.Engine.Model.Layout
+namespace AceObjectionEngine.Engine.Model.Components
 {
     public class CharacterPose : ICharacterPose
     {
@@ -54,7 +54,7 @@ namespace AceObjectionEngine.Engine.Model.Layout
             var speakSprite = MediaMaker.SpriteMaker.Make(settings.SpeakImagePath);
             var idleSprite = MediaMaker.SpriteMaker.Make(settings.IdleImagePath);
 
-            animationStates.Add(new PoseActions.SimplePoseAction()
+            animationStates.Add(new SinglePoseAction()
             {
                 State = idleSprite
             });
@@ -110,9 +110,11 @@ namespace AceObjectionEngine.Engine.Model.Layout
         public void SetStartPoseState<T>() where T : IRenderBranch
         {
             _playPosition = Array.FindIndex(PoseStates, (x) => x is T);
-            _posesDuration -= TimeSpan.FromTicks(PoseStates.Take(_playPosition).Sum(x => x.Duration.Ticks));
+            //_posesDuration -= TimeSpan.FromTicks(PoseStates.Take(_playPosition).Sum(x => x.Duration.Ticks));
             _isPlayAudioTicks = false;
             if (_playPosition < 0) throw new IndexOutOfRangeException();
         }
+
+        public IRenderBranch[] GetAllPlayPoses() => PoseStates;
     }
 }

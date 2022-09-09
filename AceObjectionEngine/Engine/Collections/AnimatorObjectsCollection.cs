@@ -19,6 +19,7 @@ namespace AceObjectionEngine.Engine.Collections
         where T : class, IAnimatorHierarchy<T>
     {
         public T Parent;
+        public int MaximumReadedIterator { get; set; }
 
         public AnimatorObjectsCollection(T parent)
         {

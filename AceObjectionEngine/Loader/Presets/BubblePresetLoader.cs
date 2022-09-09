@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Engine.Enums.SafetyEnums;
-using AceObjectionEngine.Engine.Model.Layout;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Engine.Model.Components;
+using AceObjectionEngine.Settings;
 using AceObjectionEngine.Engine.Model;
 
 namespace AceObjectionEngine.Loader.Presets

@@ -25,7 +25,7 @@ public static Bubble {0} => new BubblePresetLoader({1}).LoadObject();";
         public override void Generate()
         {
             ClassNamespace = "AceObjectionEngine";
-            References.Add("AceObjectionEngine.Engine.Model.Layout");
+            References.Add("AceObjectionEngine.Engine.Model.Components");
             References.Add("AceObjectionEngine.Loader.Presets");
             var bubbles = new BubblePresetLoader().LoadAll();
             StringBuilder builder = new StringBuilder();

@@ -28,6 +28,8 @@ namespace AceObjectionEngine.Extensions
                 if (mode != DelayMode.Freeze) iteration++;
             }
 
+            var duration = Frame.CalculateDuration(allFrames.Count());
+
             return allFrames.ToArray();
         }
 

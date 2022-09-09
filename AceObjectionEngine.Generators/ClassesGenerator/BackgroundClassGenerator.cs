@@ -25,7 +25,7 @@ public static Background {0} => new BackgroundPreset({1}).LoadObject();";
         public override void Generate()
         {
             ClassNamespace = "AceObjectionEngine";
-            References.Add("AceObjectionEngine.Engine.Model.Layout");
+            References.Add("AceObjectionEngine.Engine.Model.Components");
             References.Add("AceObjectionEngine.Loader.Presets");
             var backgrounds = new BackgroundPreset().LoadAll();
             StringBuilder builder = new StringBuilder();

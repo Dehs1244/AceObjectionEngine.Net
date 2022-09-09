@@ -25,14 +25,14 @@ namespace AceObjectionEngine.Engine.PoseActions
             {
                 var chatBox = chatBoxes.Cast<IChatBox>().First();
                 var sourceAnimated = sourceContext.Sprite.AnimateFrames();
-                if (desks.Any()) sourceAnimated = FrameRenderFactory.MergeAnimations(sourceAnimated, desks.First().Sprite.AnimateFrames(), sourceContext.ParallelOptions.InvertBreaker(), sourceContext.RepeatOnBreak).ToArray();
+                if (desks.Any()) sourceAnimated = AnimationController.MergeAnimations(sourceAnimated, desks.First().Sprite.AnimateFrames(), sourceContext.ParallelOptions.InvertBreaker(), sourceContext.RepeatOnBreak).ToArray();
 
                 var animatedFrame = chatBox.Sprite.AnimateFrames().Last();
                 animatedFrame.Delay = TimeSpan.FromSeconds(3);
 
                 var consequence = desks.Any() ?
-                    new RenderActionConsequence(FrameRenderFactory.MergeAnimations(sourceAnimated, animatedFrame.AnimateFrames(), sourceContext.SourceBreaker, sourceContext.RepeatOnBreak), desks.First()) :
-                    new RenderActionConsequence(FrameRenderFactory.MergeAnimations(sourceAnimated, animatedFrame.AnimateFrames(), sourceContext.SourceBreaker, sourceContext.RepeatOnBreak));
+                    new RenderActionConsequence(AnimationController.MergeAnimations(sourceAnimated, animatedFrame.AnimateFrames(), sourceContext.SourceBreaker, sourceContext.RepeatOnBreak), desks.First()) :
+                    new RenderActionConsequence(AnimationController.MergeAnimations(sourceAnimated, animatedFrame.AnimateFrames(), sourceContext.SourceBreaker, sourceContext.RepeatOnBreak));
                 return consequence;
             }
 

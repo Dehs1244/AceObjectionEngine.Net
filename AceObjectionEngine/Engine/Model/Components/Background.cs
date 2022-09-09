@@ -5,16 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Loader.Presets;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Settings;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Engine.Attributes;
 using AceObjectionEngine.Engine.Infrastructure;
 
-namespace AceObjectionEngine.Engine.Model.Layout
+namespace AceObjectionEngine.Engine.Model.Components
 {
     [ParallelAnimation]
     [ParallelAnimationOptions(IsSkip = false)]
-    public class Background : IObjectionObject
+    public class Background : IObjectionObject, IFloatyLayerIndex
     {
         public int Id { get; }
         public string Name { get; }
@@ -27,6 +27,10 @@ namespace AceObjectionEngine.Engine.Model.Layout
         public string ImageDeskPath { get; }
 
         public IAudioSource AudioSource => null;
+
+        public SingleEntry<int> LayerIndexer { get; set; }
+
+        public Type[] DependencyIndexer => Array.Empty<Type>();
 
         public Background(IObjectionSettings<Background> settings)
         {

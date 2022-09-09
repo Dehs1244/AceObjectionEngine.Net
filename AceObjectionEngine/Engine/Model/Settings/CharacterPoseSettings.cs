@@ -5,14 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Engine.Infrastructure;
-using AceObjectionEngine.Engine.Model.Layout;
+using AceObjectionEngine.Engine.Model.Components;
 using AceObjectionEngine.Exceptions;
 using AceObjectionEngine.Loader.Assets;
 using AceObjectionEngine.Loader.Presets;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Engine.Animator;
+using AceObjectionEngine.Engine.Model;
 
-namespace AceObjectionEngine.Engine.Model.Settings
+namespace AceObjectionEngine.Settings
 {
     public class CharacterPoseSettings : BaseSettings<CharacterPose>
     {
@@ -63,7 +64,7 @@ namespace AceObjectionEngine.Engine.Model.Settings
             {
                 if(assetPoseState.ContainsKey("imageUrl")) throw new ObjectionNotLoadedException(this);
                 var state = Sprite.FromFile(assetPoseState["fileName"]);
-                poseState.Add(new PoseActions.SimplePoseAction()
+                poseState.Add(new Engine.PoseActions.SinglePoseAction()
                 {
                     State = state,
                     Delay = TimeSpan.FromMilliseconds(assetPoseState["nextPoseDelay"])

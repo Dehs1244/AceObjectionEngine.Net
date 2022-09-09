@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
+using AceObjectionEngine.Engine.Model;
 using AceObjectionEngine.Engine.Enums.SafetyEnums;
 using AceObjectionEngine.Loader.Model;
 using AceObjectionEngine.Loader.Utils;
@@ -36,14 +37,24 @@ namespace AceObjectionEngine.Loader.Presets
 
         public async Task<IObjectionObject> LoadAsync() => await LoadObjectAsync();
 
-        public IEnumerable<T> LoadAll()
+        public IEnumerable<AceComponentSpan<T>> LoadAll()
         {
             var routes = StorageProvider.EnumerateAllRoutes(System.IO.Path.Combine(GlobalObjectionLoaderSettings.CurrentPresets.PresetsFolder, Path));
-            ICollection<T> objects = new List<T>();
+            ICollection<AceComponentSpan<T>> objects = new List<AceComponentSpan<T>>();
             foreach(var route in routes)
             {
                 Id = int.Parse(new System.IO.DirectoryInfo(route).Name);
-                objects.Add(LoadObject());
+                var id = Id;
+                objects.Add(new AceComponentSpan<T>()
+                {
+                    Component = new Lazy<T>(() =>
+                    {
+                        Id = id;
+                        return LoadObject();
+                    }),
+                    Id = Id,
+                    Name = LoadMeta().Name
+                });
             }
             Id = 0;
 

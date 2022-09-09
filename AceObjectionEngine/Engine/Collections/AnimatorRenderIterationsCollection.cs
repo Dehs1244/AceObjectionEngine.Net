@@ -17,7 +17,7 @@ namespace AceObjectionEngine.Engine.Collections
 
         public int Count => _iterations[_currentIteration].Count;
 
-        public bool IsReadOnly => false;
+        public bool IsReadOnly => _currentIteration == -1;
 
         public void StartIteration(int iteration)
         {

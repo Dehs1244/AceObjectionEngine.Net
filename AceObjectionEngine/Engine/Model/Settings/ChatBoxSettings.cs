@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
-using AceObjectionEngine.Engine.Model.Layout;
+using AceObjectionEngine.Engine.Model.Components;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Engine.Enums;
 
-namespace AceObjectionEngine.Engine.Model.Settings
+namespace AceObjectionEngine.Settings
 {
     public class ChatBoxSettings : IObjectionSettings<ChatBox>
     {

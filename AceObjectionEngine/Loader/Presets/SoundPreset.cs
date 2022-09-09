@@ -1,6 +1,6 @@
 ﻿using AceObjectionEngine.Engine.Enums.SafetyEnums;
-using AceObjectionEngine.Engine.Model.Layout;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Engine.Model.Components;
+using AceObjectionEngine.Settings;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

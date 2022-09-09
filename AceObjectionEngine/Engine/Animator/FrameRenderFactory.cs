@@ -15,7 +15,9 @@ namespace AceObjectionEngine.Engine.Animator
     /// <summary>
     /// Abstract class with support for rendering layers and using parallel rendering
     /// </summary>
-    public abstract class FrameRenderFactory : IFrameRenderer<Frame>
+    /// <typeparam name="TFrameFragment">Frame rendering fragment</typeparam>
+    public abstract class FrameRenderFactory<TFrameFragment> : IFrameRenderer<Frame>, IAudioMixerCreator
+        where TFrameFragment : IFrameFragment
     {
         public IAnimator<Frame> Animator { get; }
 
@@ -24,11 +26,13 @@ namespace AceObjectionEngine.Engine.Animator
         public TimeSpan TimeLineAnimationDuration { get; set; }
         public TimeSpan TimeLineRenderDuration { get; set; }
 
-        public IAudioMixer AudioMixer { get; protected set; }
+        public IAudioMixer AudioMixer => RenderedAudioMixers.Last();
 
         public AnimatorRenderIterationsCollection<ISpriteSource> RenderedSprites { get; }
 
         public AnimatorRenderIterationsCollection<IAudioMixer> RenderedAudioMixers { get; }
+
+        protected TFrameFragment BakedRenderFragment { get; private set; }
 
         public FrameRenderFactory(ObjectionAnimator animator)
         {
@@ -39,68 +43,30 @@ namespace AceObjectionEngine.Engine.Animator
 
         public abstract Task<IAudioSource> RenderLayerAudioAsync(AnimationRenderContext audioSource);
         public abstract Task<IAudioSource> RenderAudioTickAsync(IAudioSource sprite, TimeSpan delay);
-        public abstract Task RenderAllAsync();
+        public abstract Task RenderAllAsync(RenderingEndPointContext context);
         public abstract Task<ISpriteSource> RenderLayerSpriteAsync(ISpriteSource sprite);
         public abstract IAudioMixer CreateAudioMixer(TimeSpan timeLine);
+        public abstract Task<TFrameFragment> RenderFragmentInnerAsync();
 
-        public virtual void RenderAll() => RenderAllAsync().GetAwaiter().GetResult();
+        protected abstract Task<TFrameFragment> BakeFrameFragmentAsync(TFrameFragment processedFragment);
+
+        public virtual void RenderAll(RenderingEndPointContext context) => RenderAllAsync(context).GetAwaiter().GetResult();
         public virtual void RenderAudio(AnimationRenderContext[] layerAudioSources) => RenderAudioAsync(layerAudioSources).GetAwaiter().GetResult();
+        public virtual void RenderFragment() => RenderFragmentAsync().GetAwaiter().GetResult();
+        public void RenderSingleAudio(IAudioSource audio, TimeSpan timeLine) => RenderSingleAudioAsync(audio, timeLine).GetAwaiter().GetResult();
         public virtual void RenderSprite(AnimationRenderContext[] layerSprites) => RenderSpriteAsync(layerSprites).GetAwaiter().GetResult();
-
-        public static IList<ISpriteSource> MergeAnimations(IList<ISpriteSource> firstFrames, IList<ISpriteSource> secondFrames, Attributes.AnimationStateBreaker breaker, bool repeatOnBreak = false)
-        {
-            if (!firstFrames.Any()) return secondFrames;
-            if (!secondFrames.Any()) return firstFrames;
-
-            IList<ISpriteSource> renderedParallelAnimation = new List<ISpriteSource>();
-            var firstFrameIteration = 0;
-            var secondFrameIteration = 0;
-
-            var processingCounter = breaker == Attributes.AnimationStateBreaker.Parallel ? firstFrames.Count : secondFrames.Count;
-
-            for (var i = 0; i < processingCounter; i++)
-            {
-                var passiveAnimationFrameError = breaker == Attributes.AnimationStateBreaker.Parallel ?
-                secondFrameIteration >= secondFrames.Count
-                : firstFrameIteration >= firstFrames.Count;
-
-                if (passiveAnimationFrameError)
-                {
-                    //if (context.Breaker == Attributes.AnimationStateBreaker.Origin) break;
-                    switch (breaker)
-                    {
-                        case Attributes.AnimationStateBreaker.Origin:
-                            if (!repeatOnBreak) secondFrames.Add((ISpriteSource)firstFrames.Last().Clone());
-                            else firstFrameIteration = 0;
-                            break;
-                        case Attributes.AnimationStateBreaker.Parallel:
-                            if (!repeatOnBreak) secondFrames.Add((ISpriteSource)secondFrames.Last().Clone());
-                            else secondFrameIteration = 0;
-                            break;
-                    }
-                }
-                var frame = (ISpriteSource)firstFrames[firstFrameIteration].Clone();
-
-                renderedParallelAnimation.Add(frame.MergeSprite(secondFrames[secondFrameIteration]));
-
-                secondFrameIteration++;
-                firstFrameIteration++;
-            }
-
-            return renderedParallelAnimation;
-        }
 
         public async Task RenderSpriteAsync(AnimationRenderContext[] layerSprites)
         {
             await Task.Run(async () =>
             {
                 RenderedSprites.StartIteration(SpriteIteration);
-                var behaviour = new ParallelRenderingBehaviour(this, layerSprites);
+                var behaviour = new ParallelRenderingBehaviour<TFrameFragment>(this, layerSprites);
 
                 ISpriteSource result = new Sprite(new System.Drawing.Bitmap(layerSprites.First().Sprite.Width, layerSprites.First().Sprite.Height));
                 bool usedParallelRender = false;
                 int toSkipRenders = 0;
-                foreach(var layerSprite in layerSprites)
+                foreach (var layerSprite in layerSprites)
                 {
                     await layerSprite.AnimationObject.StartAnimationAsync();
                 }
@@ -134,6 +100,21 @@ namespace AceObjectionEngine.Engine.Animator
             });
         }
 
+        public async Task RenderSingleAudioAsync(IAudioSource audio, TimeSpan timeLine)
+        {
+            IAudioSource audioRendered = await RenderAudioTickAsync(audio, timeLine);
+            AudioMixer.Mix(ref audioRendered);
+            audioRendered.Dispose();
+        }
+
+        public async Task RenderFragmentAsync()
+        {
+            var rendered = await RenderFragmentInnerAsync();
+            BakedRenderFragment = await BakeFrameFragmentAsync(rendered);
+            RenderedAudioMixers.Clear();
+            RenderedSprites.Clear();
+        }
+
         public async Task RenderAudioAsync(AnimationRenderContext[] layerAudioSources)
         {
             await Task.Run(async () =>
@@ -142,7 +123,7 @@ namespace AceObjectionEngine.Engine.Animator
                 {
                     if (layerAudioSources[i].AudioTicks.Any())
                     {
-                        for(var y = 0; y < layerAudioSources[i].AudioTicks.Count(); y++)
+                        for (var y = 0; y < layerAudioSources[i].AudioTicks.Count(); y++)
                         {
                             IAudioSource audioTickRender = await RenderAudioTickAsync(layerAudioSources[i].AudioTicks[y], TimeLineRenderDuration);
                             AudioMixer.Mix(ref audioTickRender);
@@ -167,10 +148,9 @@ namespace AceObjectionEngine.Engine.Animator
         public void ResetAudioMixer(TimeSpan timeLine)
         {
             TimeLineRenderDuration = TimeSpan.Zero;
+            if (!RenderedAudioMixers.IsReadOnly) RenderedAudioMixers.EndIteration();
             RenderedAudioMixers.StartIteration(AudioSourceIteration);
-            AudioMixer = CreateAudioMixer(timeLine);
-            RenderedAudioMixers.Add(AudioMixer);
-            RenderedAudioMixers.EndIteration();
+            RenderedAudioMixers.Add(CreateAudioMixer(timeLine));
             AudioSourceIteration++;
         }
 
@@ -182,10 +162,11 @@ namespace AceObjectionEngine.Engine.Animator
 
         public void Dispose()
         {
-            foreach(var frame in RenderedSprites.MapAll())
+            foreach (var frame in RenderedSprites.MapAll())
             {
                 frame.Dispose();
             }
+            BakedRenderFragment?.Dispose();
         }
     }
 }

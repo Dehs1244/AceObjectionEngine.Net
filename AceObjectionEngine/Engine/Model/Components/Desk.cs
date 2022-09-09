@@ -6,24 +6,30 @@ using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Engine.Animator;
 using AceObjectionEngine.Engine.Attributes;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Settings;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Engine.Infrastructure;
 using AceObjectionEngine.Abstractions.Layout;
+using AceObjectionEngine.Helpers;
 
-namespace AceObjectionEngine.Engine.Model.Layout
+namespace AceObjectionEngine.Engine.Model.Components
 {
     [ParallelAnimation]
     [ParallelAnimationOptions(AnimationStateBreaker.Origin, IsSkip = true)]
     public class Desk : IDesk
     {
         public int Id { get; }
+        public string Name { get; }
 
         public ISpriteSource Sprite { get; }
 
         public IAudioSource AudioSource => null;
 
         public TimeSpan DurationCounter => TimeSpan.Zero;
+
+        public SingleEntry<int> LayerIndexer { get; set; }
+
+        public Type[] DependencyIndexer => EnumerableHelper.ToEnumerable(typeof(Background)).ToArray();
 
         public Desk(IObjectionSettings<Desk> settings)
         {

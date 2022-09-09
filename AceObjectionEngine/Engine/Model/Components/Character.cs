@@ -7,7 +7,7 @@ using AceObjectionEngine.Abstractions.Layout.Character;
 using AceObjectionEngine.Engine.Enums.SafetyEnums;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Loader.Presets;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Settings;
 using System.Collections.ObjectModel;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Engine.Attributes;
@@ -15,7 +15,7 @@ using AceObjectionEngine.Engine.Enums;
 using AceObjectionEngine.Engine.PoseActions;
 using AceObjectionEngine.Engine.Animator;
 
-namespace AceObjectionEngine.Engine.Model.Layout
+namespace AceObjectionEngine.Engine.Model.Components
 {
     [ParallelAnimation(nameof(IsSpeaking))]
     public class Character : ICharacter, IRerenderable
@@ -25,12 +25,12 @@ namespace AceObjectionEngine.Engine.Model.Layout
         public string NamePlate { get; }
         public BlipSexType Sex { get; }
 
-        public ICharacterPose ActivePose => Poses.Where(x=> x.Id == StatePoseId).First();
+        public ICharacterPose ActivePose => Poses.Where(x=> x.Id == StatePoseId).First().Component.Value;
 
         public bool IsSpeaking => ActivePose.ActivePoseState is SpeakingPoseAction;
         public TimeSpan DurationCounter => ActivePose.DurationCounter;
 
-        public IReadOnlyCollection<ICharacterPose> Poses { get; }
+        public IReadOnlyCollection<AceComponentSpan<ICharacterPose>> Poses { get; }
 
         public ISpriteSource Sprite => ActivePose.ActivePoseState.State;
 
@@ -54,13 +54,13 @@ namespace AceObjectionEngine.Engine.Model.Layout
         {
             Id = settings.Id;
             settings.Apply(this);
-            Poses = new ReadOnlyCollection<ICharacterPose>(new List<ICharacterPose>());
+            Poses = new ReadOnlyCollection<AceComponentSpan<ICharacterPose>>(new List<AceComponentSpan<ICharacterPose>>());
         }
 
         public Character(CharacterSettings settings)
         {
             Id = settings.Id;
-            Poses = new ReadOnlyCollection<ICharacterPose>(settings.Poses);
+            Poses = new ReadOnlyCollection<AceComponentSpan<ICharacterPose>>(settings.Poses);
             Poses = settings.Poses ?? Poses;
             settings.Apply(this);
             Name = settings.Name ?? "Unknown";
@@ -112,7 +112,7 @@ namespace AceObjectionEngine.Engine.Model.Layout
         {
             foreach(var pose in Poses)
             {
-                pose.Dispose();
+                if(pose.Component.IsValueCreated) pose.Component.Value.Dispose();
             }
         }
 

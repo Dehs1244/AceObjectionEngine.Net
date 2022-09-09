@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AceObjectionEngine.Engine.Model.Layout;
+using AceObjectionEngine.Engine.Model.Components;
 using AceObjectionEngine.Loader.Presets;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Engine.Infrastructure;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Engine.Effects;
 using AceObjectionEngine.Helpers;
+using AceObjectionEngine.Engine.Model;
 
-namespace AceObjectionEngine.Engine.Model.Settings
+namespace AceObjectionEngine.Settings
 {
     public class BubbleSettings : BaseSettings<Bubble>
     {

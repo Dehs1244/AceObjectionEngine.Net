@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
-using AceObjectionEngine.Engine.Model.Layout;
+using AceObjectionEngine.Engine.Model.Components;
 using AceObjectionEngine.Loader.Presets;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Exceptions;
 using AceObjectionEngine.Engine.Infrastructure;
 
-namespace AceObjectionEngine.Engine.Model.Settings
+namespace AceObjectionEngine.Settings
 {
     public class BackgroundSettings : BaseSettings<Background>
     {

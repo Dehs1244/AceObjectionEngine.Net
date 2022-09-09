@@ -26,6 +26,11 @@ namespace AceObjectionEngine.Tests.TestObjects
 
         public bool IsFixate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public IAudioSource AddOffset(TimeSpan offset)
+        {
+            throw new NotImplementedException();
+        }
+
         public object Clone()
         {
             throw new NotImplementedException();

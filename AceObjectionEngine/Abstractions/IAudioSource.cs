@@ -49,6 +49,12 @@ namespace AceObjectionEngine.Abstractions
         /// <returns>New Mixed Instance Of <see cref="IAudioSource"/></returns>
         IAudioSource Mix(IEnumerable<IAudioSource> audioSources);
         /// <summary>
+        /// Adding offset to begin of audio (Not to property <see cref="Offset"/>)
+        /// </summary>
+        /// <param name="offset">Beggining offset of audio</param>
+        /// <returns>New Instance Of <see cref="IAudioSource"/></returns>
+        IAudioSource AddOffset(TimeSpan offset);
+        /// <summary>
         /// Loops audio source
         /// </summary>
         /// <param name="loopTime">Time for loop</param>

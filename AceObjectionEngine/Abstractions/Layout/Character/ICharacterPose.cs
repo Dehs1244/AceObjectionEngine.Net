@@ -14,6 +14,7 @@ namespace AceObjectionEngine.Abstractions.Layout.Character
         bool IsSpeedlines { get; }
         IRenderBranch ActivePoseState { get; }
         IAudioSource[] AudioTicks { get; }
+        IRenderBranch[] GetAllPlayPoses();
 
         bool Play();
         void SetStartPoseState<T>() where T : IRenderBranch;

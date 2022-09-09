@@ -5,14 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Loader.Presets;
-using AceObjectionEngine.Engine.Model.Layout;
+using AceObjectionEngine.Engine.Model.Components;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Engine.Attributes;
 using AceObjectionEngine.Exceptions;
 using AceObjectionEngine.Engine.Utils;
 using AceObjectionEngine.Engine.Infrastructure;
 
-namespace AceObjectionEngine.Engine.Model.Settings
+namespace AceObjectionEngine.Settings
 {
     public class SoundSettings : BaseSettings<Audio>
     {

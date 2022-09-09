@@ -1,6 +1,6 @@
 ﻿using AceObjectionEngine.Engine.Animator;
-using AceObjectionEngine.Engine.Model.Layout;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Engine.Model.Components;
+using AceObjectionEngine.Settings;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -217,6 +217,101 @@ namespace AceObjectionEngine.Tests
         }
 
         [Fact]
+        public void BuildTestWithMultipleBackgrounds()
+        {
+            ObjectionBuilder builder = new ObjectionBuilder();
+
+            builder.AddGlobalAudio(ObjectionMusic.AHurtFox)
+                .CreateScene((scene) =>
+                {
+                    scene.AddBackground(ObjectionBackgrounds.PWWitness);
+
+                    scene.AddCharacter(ObjectionCharacters.PhoenixWrightDefense.WithPose(3));
+                    scene.AddDialogue(new ChatBoxSettings()
+                    {
+                        Text = "Test dialogue"
+                    });
+
+                    scene.AddDialogue(new ChatBoxSettings()
+                    {
+                        Text = "And another dialogue"
+                    });
+
+                    scene.AddCharacter(ObjectionCharacters.MilesEdgeworthProsecution);
+                    scene.AddDialogue(new ChatBoxSettings()
+                    {
+                        Text = "Nice test"
+                    });
+
+                    scene.AddBackground(ObjectionBackgrounds.ColiseumStage);
+                    scene.AddCharacter(ObjectionCharacters.PhoenixWrightDefense.WithPose(3));
+                    scene.AddDialogue(new ChatBoxSettings()
+                    {
+                        Text = "But now, i'm with new background"
+                    });
+                });
+
+            using var animator = builder.Build<ObjectionAnimator>();
+            animator.Animate();
+
+            var outputPath = "someObjection.mp4";
+            animator.SaveAsFile(outputPath);
+            Assert.True(File.Exists(outputPath));
+        }
+
+        [Fact]
+        public void BuildTestWithGlobalAudio()
+        {
+            ObjectionBuilder builder = new ObjectionBuilder();
+
+            builder.AddGlobalAudio(ObjectionMusic.AHurtFox)
+                .CreateScene((scene) =>
+            {
+                scene.AddBackground(ObjectionBackgrounds.PWWitness);
+
+                scene.AddCharacter(ObjectionCharacters.PhoenixWrightDefense.WithPose(3));
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "Test dialogue with desk"
+                });
+
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "And another dialogue"
+                });
+
+                scene.AddCharacter(ObjectionCharacters.MilesEdgeworthProsecution);
+                scene.AddDialogue(new ChatBoxSettings()
+                {
+                    Text = "Nice desk"
+                });
+            })
+                .CreateScene((scene) =>
+                {
+                    scene.AddBackground(ObjectionBackgrounds.Studio1);
+
+                    scene.AddCharacter(ObjectionCharacters.PhoenixWrightDefense);
+                    scene.AddDialogue(new ChatBoxSettings()
+                    {
+                        Text = "Test next scene with global audio"
+                    });
+
+                    scene.AddCharacter(ObjectionCharacters.MilesEdgeworthProsecution);
+                    scene.AddDialogue(new ChatBoxSettings()
+                    {
+                        Text = "Nice test"
+                    });
+                });
+
+            using var animator = builder.Build<ObjectionAnimator>();
+            animator.Animate();
+
+            var outputPath = "someObjection.mp4";
+            animator.SaveAsFile(outputPath);
+            Assert.True(File.Exists(outputPath));
+        }
+
+        [Fact]
         public void BuildWithDeskTest()
         {
             ObjectionBuilder builder = new ObjectionBuilder();
@@ -229,7 +324,7 @@ namespace AceObjectionEngine.Tests
                 scene.AddCharacter(ObjectionCharacters.PhoenixWrightDefense.WithRandomPose());
                 scene.AddDialogue(new ChatBoxSettings()
                 {
-                    Text = "Test dialogue with deks"
+                    Text = "Test dialogue with desk"
                 });
 
                 scene.AddDialogue(new ChatBoxSettings()

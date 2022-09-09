@@ -25,7 +25,7 @@ public static Audio {0} => new SoundPreset({1}).LoadObject();";
         public override void Generate()
         {
             ClassNamespace = "AceObjectionEngine";
-            References.Add("AceObjectionEngine.Engine.Model.Layout");
+            References.Add("AceObjectionEngine.Engine.Model.Components");
             References.Add("AceObjectionEngine.Loader.Presets");
             var sounds = new SoundPreset().LoadAll();
             StringBuilder builder = new StringBuilder();

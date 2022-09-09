@@ -1,4 +1,5 @@
 ﻿using AceObjectionEngine.Abstractions.Layout.Character;
+using AceObjectionEngine.Engine.Attributes;
 using AceObjectionEngine.Engine.Enums;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace AceObjectionEngine.Abstractions.Layout
     /// <summary>
     /// Implementation interface of chatbox
     /// </summary>
+    [FloatyIndexInvoker]
     public interface IChatBox : IObjectionObject
     {
         /// <summary>

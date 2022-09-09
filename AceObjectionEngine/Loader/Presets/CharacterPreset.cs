@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Engine.Enums.SafetyEnums;
-using AceObjectionEngine.Engine.Model.Layout;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Engine.Model.Components;
+using AceObjectionEngine.Settings;
 using AceObjectionEngine.Abstractions.Layout.Character;
 using AceObjectionEngine.Engine.Model;
 
@@ -27,13 +27,20 @@ namespace AceObjectionEngine.Loader.Presets
         {
             var meta = LoadMeta();
             var allPoses = StorageProvider.EnumerateAllRoutes(GetCombinedPresetPath("poses"));
-            List<ICharacterPose> characterPoses = new List<ICharacterPose>();
+            List<AceComponentSpan<ICharacterPose>> characterPoses = new List<AceComponentSpan<ICharacterPose>>();
 
             foreach (var pose in allPoses)
             {
                 var metaPose = LoadMeta(pose + "/meta.json");
-                characterPoses.Add(new CharacterPose(new CharacterPoseSettings(metaPose.ToJson())));
+                var poseSettings = new CharacterPoseSettings(metaPose.ToJson());
+                characterPoses.Add(new AceComponentSpan<ICharacterPose>() 
+                {
+                    Component = new Lazy<ICharacterPose>(() => new CharacterPose(poseSettings)),
+                    Id = poseSettings.Id,
+                    Name = poseSettings.Name
+                });
             }
+
             var settings = new CharacterSettings(meta.ToJson())
             {
                 Poses = characterPoses

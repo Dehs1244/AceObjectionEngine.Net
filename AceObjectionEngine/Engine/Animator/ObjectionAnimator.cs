@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
+using AceObjectionEngine.Engine.AudioMixers;
 using AceObjectionEngine.Engine.Model;
-using AceObjectionEngine.Engine.Model.Layout;
+using AceObjectionEngine.Engine.Model.Components;
 using AceObjectionEngine.Exceptions;
 using AceObjectionEngine.Helpers;
 
@@ -15,6 +16,7 @@ namespace AceObjectionEngine.Engine.Animator
     public class ObjectionAnimator : IAnimator<Frame>
     {
         public ICollection<Frame> Hierarchy { get; }
+        public TimeSpan Duration => TimeSpan.FromTicks(Hierarchy.Sum(x => x.Duration.Ticks));
 
         public Stream OutputStream { get; private set; }
 
@@ -28,10 +30,16 @@ namespace AceObjectionEngine.Engine.Animator
 
         public IFrameRenderer<Frame> Renderer { get; }
 
+        private IAudioMixer _mainMixer;
+        private bool _isAnimating;
+
+        public ICollection<AceAudioTrackContainer> GlobalAudio { get; }
+
         public ObjectionAnimator(IFrameRenderer<Frame> frameRender = null)
         {
             OutputStream = new MemoryStream();
             Hierarchy = new List<Frame>();
+            GlobalAudio = new List<AceAudioTrackContainer>();
             Width = MinimalWidth;
             Height = MinimalHeight;
             Renderer = frameRender ?? new FFMpegFrameRender(this, OutputStream);
@@ -43,8 +51,13 @@ namespace AceObjectionEngine.Engine.Animator
         {
             if (MinimalHeight > Height) throw new ObjectionMinimalSizeException(MinimalHeight, Height);
             if (MinimalWidth > Width) throw new ObjectionMinimalSizeException(MinimalWidth, Width);
+            if (_isAnimating) throw new ObjectionAlreadyAnimatedException();
+            _mainMixer = Renderer is IAudioMixerCreator creator ? creator.CreateAudioMixer(Duration) : new FFMpegAudioMixer(Duration);
+
             try
             {
+                _isAnimating = true;
+
                 foreach (var frame in Hierarchy)
                 {
                     Renderer.ResetAudioMixer(frame.Duration);
@@ -56,11 +69,22 @@ namespace AceObjectionEngine.Engine.Animator
                         if (frameSprites.Any()) await Renderer.RenderSpriteAsync(frameSprites.ToArray());
                         if (audioSources.Any()) await Renderer.RenderAudioAsync(audioSources.ToArray());
                     }
+                    await Renderer.RenderFragmentAsync();
                 }
 
-                await Renderer.RenderAllAsync();
+
+                for(var i = 0; i < GlobalAudio.Count; i++)
+                {
+                    var sampleAudio = GlobalAudio.ElementAt(i);
+                    if (sampleAudio.Start != TimeSpan.Zero) sampleAudio.Audio = sampleAudio.Audio.AddOffset(sampleAudio.Start);
+                    if (sampleAudio.End != TimeSpan.Zero) sampleAudio.Audio = sampleAudio.Audio.SetDuration(sampleAudio.End);
+                    _mainMixer.Mix(ref sampleAudio.Audio);
+                }
+
+                await Renderer.RenderAllAsync(new RenderingEndPointContext(_mainMixer));
             }finally
             {
+                _isAnimating = false;
                 TempFileStream.ImmediatelyFreeTempFiles();
             }
         }

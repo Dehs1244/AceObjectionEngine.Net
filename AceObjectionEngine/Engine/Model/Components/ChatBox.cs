@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Abstractions.Layout.Character;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Settings;
 using AceObjectionEngine.Engine.Enums;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Extensions;
@@ -15,13 +15,15 @@ using AceObjectionEngine.Loader.Presets;
 using AceObjectionEngine.Engine.Animator;
 using AceObjectionEngine.Abstractions.Layout;
 
-namespace AceObjectionEngine.Engine.Model.Layout
+namespace AceObjectionEngine.Engine.Model.Components
 {
     public class ChatBox : IChatBox
     {
         public int Id { get; }
+        public string Name => "Objection chatbox";
 
-        public ISpriteSource Sprite { get; }
+        private Lazy<ISpriteSource> _lazySprite;
+        public ISpriteSource Sprite => _lazySprite.Value;
         public string Text { get; }
         public AceSize AnimatorSize { get; }
         public ChatBoxAlign Align { get; }
@@ -40,7 +42,7 @@ namespace AceObjectionEngine.Engine.Model.Layout
             Align = settings.Align;
             ReferenceCharacter = character;
             FontSize = settings.FontSize;
-            Sprite = _DrawSprite();
+            _lazySprite = new Lazy<ISpriteSource>(() => _DrawSprite());
             Text = settings.Text;
         }
 
@@ -49,7 +51,7 @@ namespace AceObjectionEngine.Engine.Model.Layout
             Id = settings.Id;
             settings.Apply(this);
             ReferenceCharacter = character;
-            Sprite = _DrawSprite();
+            _lazySprite = new Lazy<ISpriteSource>(() => _DrawSprite());
         }
 
         private ISpriteSource _DrawSprite()

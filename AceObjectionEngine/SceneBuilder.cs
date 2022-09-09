@@ -6,8 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions.Layout.Character;
-using AceObjectionEngine.Engine.Model.Layout;
-using AceObjectionEngine.Engine.Model.Settings;
+using AceObjectionEngine.Engine.Model.Components;
+using AceObjectionEngine.Settings;
 
 namespace AceObjectionEngine
 {
@@ -26,6 +26,8 @@ namespace AceObjectionEngine
         public SceneBuilder AddCharacter(ICharacter character)
         {
             _frame.Objects.Add(_settings.CharacterLayer, character);
+            var speakPosition = Array.FindIndex(character.ActivePose.GetAllPlayPoses(), (x) => x is Engine.PoseActions.SpeakingPoseAction);
+            _frame.Offset = _frame.Offset.Add(TimeSpan.FromTicks(character.ActivePose.GetAllPlayPoses().Take(speakPosition).Sum(x => x.State.Duration.Ticks + x.Delay.Ticks)));
             _createdCharacters.Push(character);
             _addedCharacter = true;
             return this;
@@ -34,7 +36,11 @@ namespace AceObjectionEngine
         public SceneBuilder AddBackground(Background background)
         {
             _frame.Objects.Add(_settings.BackgroundLayer, background);
-            if (background.Desk != null) _frame.Objects.Add(_settings.DeskLayer, background.Desk);
+            if (background.Desk != null)
+            {
+                _frame.Objects.Add(_settings.DeskLayer, background.Desk);
+            }
+
             return this;
         }
 
@@ -68,10 +74,14 @@ namespace AceObjectionEngine
             dialogueSettings.Width = _settings.Width;
             dialogueSettings.Height = _settings.Height;
 
-            Bubble emptyBubble = null;
-            _frame.Objects.Add(_settings.BubbleLayer, emptyBubble);
+            if (!_addedCharacter)
+            {
+                var addingCharacter = _createdCharacters.Peek();
+                _frame.Objects.Add(_settings.CharacterLayer, addingCharacter);
+                _createdCharacters.Push(addingCharacter);
+                _addedCharacter = true;
+            }
             _frame.Objects.Add(_settings.DialogueLayer, new ChatBox(_createdCharacters.Peek(), dialogueSettings));
-            if (!_addedCharacter) AddCharacter(_createdCharacters.Peek());
             _addedCharacter = false;
             return this;
         }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Abstractions.Async;
+using AceObjectionEngine.Engine.Model;
 
 namespace AceObjectionEngine.Abstractions
 {
@@ -18,6 +19,10 @@ namespace AceObjectionEngine.Abstractions
         /// Animator Height
         /// </summary>
         int Height { get; }
+        /// <summary>
+        /// Audio on the global audio track
+        /// </summary>
+        ICollection<AceAudioTrackContainer> GlobalAudio { get; }
         /// <summary>
         /// Sample layer render
         /// </summary>

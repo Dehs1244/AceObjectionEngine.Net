@@ -36,6 +36,9 @@ namespace AceObjectionEngine.Engine.Infrastructure
                 _hasValue = true;
             }
         }
+
+        public bool IsValueCreated => _hasValue;
+
         public T ValueOrDefault => _hasValue ? _value : default;
 
         public static implicit operator T(SingleEntry<T> value) => value.Value;

@@ -11,19 +11,64 @@ using AceObjectionEngine.Engine.Model;
 using AceObjectionEngine.Helpers;
 using AceObjectionEngine.Engine.Collections;
 using AceObjectionEngine.Engine.AudioMixers;
+using FFMpegCore.Enums;
 
 namespace AceObjectionEngine.Engine.Animator
 {
-    public class FFMpegFrameRender : FrameRenderFactory
+    public class FFMpegFrameRender : FrameRenderFactory<FrameFragment>
     {
-        private StreamPipeSink _pipeStream { get; }
+        private Stream _sourceStream { get; }
 
         public FFMpegFrameRender(ObjectionAnimator animator, Stream outputStream) : base(animator)
         {
-            _pipeStream = new StreamPipeSink(outputStream);
+            _sourceStream = outputStream;
         }
 
-        public override async Task RenderAllAsync()
+        public override async Task RenderAllAsync(RenderingEndPointContext context)
+        {
+            FFMpegArguments factory = null;
+            IAudioSource audio = context.MainMixer.Create();
+            var bakedRenderFragmentMp4 = new TempFileStream("baked-frag.mp4");
+            bakedRenderFragmentMp4.Close();
+
+            if (BakedRenderFragment != null)
+            {
+                await FFMpegArguments.FromFileInput(BakedRenderFragment.FilePath)
+                .OutputToFile(bakedRenderFragmentMp4.FilePath, true, options =>
+                {
+                    options.CopyChannel();
+                })
+                .ProcessAsynchronously();
+
+                factory = FFMpegArguments.FromFileInput(bakedRenderFragmentMp4.FilePath);
+            }
+            audio = audio.SetDuration(TimeLineAnimationDuration);
+
+            if (audio != null) factory.AddFileInput(audio.FilePath);
+
+            FileStream tempCompletedResult = new TempFileStream("OBJECTION-COMPLETED.mp4");
+            tempCompletedResult.Close();
+
+            await factory?.OutputToFile(tempCompletedResult.Name, true, options =>
+            {
+                options
+                .WithFramerate((int)ObjectionAnimator.FrameRate)
+                .WithDuration(TimeLineAnimationDuration)
+                .WithCustomArgument("-filter_complex \"[0:a][1:a]amerge,pan=stereo|c0<c0+c2|c1<c1+c3[a]\" -map 0:v -map \"[a]\" -c:v copy -c:a aac -shortest");
+            }).ProcessAsynchronously();
+
+            tempCompletedResult = File.OpenRead(tempCompletedResult.Name);
+
+            tempCompletedResult.Seek(0, SeekOrigin.Begin);
+            tempCompletedResult.CopyTo(_sourceStream);
+
+            tempCompletedResult.Dispose();
+            bakedRenderFragmentMp4.Dispose();
+
+            audio.Dispose();
+        }
+
+        public override async Task<FrameFragment> RenderFragmentInnerAsync()
         {
             var renderedVideoFrames = RenderedSprites.MapAll().OfType<IVideoFrame>();
             FFMpegArguments factory = null;
@@ -41,9 +86,9 @@ namespace AceObjectionEngine.Engine.Animator
             }
             IAudioSource audio = null;
 
-            foreach(var audioMixer in RenderedAudioMixers.MapAll())
+            foreach (var audioMixer in RenderedAudioMixers.MapAll())
             {
-                if(audio == null)
+                if (audio == null)
                 {
                     audio = audioMixer.Create();
                 }
@@ -52,17 +97,31 @@ namespace AceObjectionEngine.Engine.Animator
                     audio = audio.Merge(audioMixer.Create());
                 }
             }
-            audio = audio.SetDuration(TimeLineAnimationDuration);
 
-            if (audio != null) factory.AddFileInput(audio.FilePath);
-
-            await factory?.OutputToPipe(_pipeStream, options =>
+            if (audio != null)
             {
-                options.WithVideoCodec("vp9")
+                audio = audio.SetDuration(TimeLineRenderDuration);
+                factory.AddFileInput(audio.FilePath);
+            }
+
+            var tempFragmentWebm = new TempFileStream("frag.webm");
+            Stream spanStream = new MemoryStream();
+
+            await factory?.OutputToPipe(new StreamPipeSink(spanStream), options =>
+            {
+                options
+                .WithVideoCodec("vp9")
                 .ForceFormat("webm");
             }).ProcessAsynchronously();
-
             audio.Dispose();
+
+            spanStream.Seek(0, SeekOrigin.Begin);
+            spanStream.CopyTo(tempFragmentWebm);
+            spanStream.Dispose();
+
+            tempFragmentWebm.Close();
+
+            return new FrameFragment(tempFragmentWebm.FilePath);
         }
 
         public override Task<ISpriteSource> RenderLayerSpriteAsync(ISpriteSource sprite)
@@ -72,26 +131,13 @@ namespace AceObjectionEngine.Engine.Animator
 
         public override async Task<IAudioSource> RenderAudioTickAsync(IAudioSource audio, TimeSpan delay)
         {
-            var tempFile = new TempFileStream("OBJECTION-AUDIO-RENDER.mp3");
-            tempFile.Close();
-
-            await FFMpegArguments
-            .FromFileInput(audio.FilePath)
-            .OutputToFile(tempFile.FilePath, true, options =>
-            {
-                if (audio.Offset.Ticks > 0)
-                    options.WithCustomArgument($"-af areverse,apad=pad_dur={(int)audio.Offset.TotalMilliseconds}ms,areverse");
-
-                options
-                .WithAudioBitrate((int)audio.BitRate);
-            })
-            .ProcessAsynchronously();
+            audio = audio.AddOffset(audio.Offset);
 
             var tempFileDelay = new TempFileStream("OBJECTION-AUDIO-RENDER.mp3");
             tempFileDelay.Close();
 
             await FFMpegArguments
-            .FromFileInput(tempFile.FilePath)
+            .FromFileInput(audio.FilePath)
             .OutputToFile(tempFileDelay.FilePath, true, options =>
             {
                 if (delay.Ticks > 0)
@@ -102,7 +148,6 @@ namespace AceObjectionEngine.Engine.Animator
             })
             .ProcessAsynchronously();
 
-            tempFile.Dispose();
             audio.Dispose();
             IAudioSource renderedAudio = new AudioSource(tempFileDelay);
 
@@ -147,6 +192,25 @@ namespace AceObjectionEngine.Engine.Animator
 
             //Pipe is shit, better using temp files
             return renderedAudio;
+        }
+
+        protected override async Task<FrameFragment> BakeFrameFragmentAsync(FrameFragment processedFragment)
+        {
+            if (BakedRenderFragment == null) return processedFragment;
+
+            var bakedTempFile = new TempFileStream("baked-frag.webm");
+            bakedTempFile.Close();
+
+            await FFMpegArguments.FromFileInput(BakedRenderFragment.FilePath)
+                .AddFileInput(processedFragment.FilePath)
+                .OutputToFile(bakedTempFile.FilePath, true, options =>
+                {
+                    options.WithCustomArgument("-filter_complex \"[0:v][0:a][1:v][1:a] concat=n=2:v=1:a=1[v][a]\" -map \"[v]\" -map \"[a]\"");
+                }).ProcessAsynchronously();
+
+            BakedRenderFragment?.Dispose();
+            processedFragment?.Dispose();
+            return new FrameFragment(bakedTempFile.FilePath);
         }
 
         public override IAudioMixer CreateAudioMixer(TimeSpan timeLine) => new FFMpegAudioMixer(timeLine);

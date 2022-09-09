@@ -18,7 +18,10 @@ namespace AceObjectionEngine.Abstractions
         /// Animation Updater
         /// </summary>
         int Updater { get; }
-
+        /// <summary>
+        /// Will this frame reset audio playback on the global audio track
+        /// </summary>
+        bool ResetAudioGlobalTrack { get; set; }
         /// <summary>
         /// Duration of the animation hierarchy
         /// </summary>

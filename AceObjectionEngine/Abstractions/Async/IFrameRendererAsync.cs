@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Engine.Animator;
 using AceObjectionEngine.Engine.Collections;
+using AceObjectionEngine.Engine.Model;
 
 namespace AceObjectionEngine.Abstractions.Async
 {
@@ -44,8 +45,21 @@ namespace AceObjectionEngine.Abstractions.Async
         Task RenderAudioAsync(AnimationRenderContext[] layerAudioSources);
 
         /// <summary>
-        /// Asynchronously Render of all rendered objects into a stream
+        /// Asynchronously rendering single audio on audio mixer
         /// </summary>
-        Task RenderAllAsync();
+        /// <param name="audio">Audio to render</param>
+        /// <param name="timeLine">Time where start playing audio</param>
+        Task RenderSingleAudioAsync(IAudioSource audio, TimeSpan start);
+
+        /// <summary>
+        /// Asynchronously rendering the current fragment and add it to fragments pool
+        /// </summary>
+        Task RenderFragmentAsync();
+
+        /// <summary>
+        /// Asynchronously Render of all rendered fragments into a stream
+        /// </summary>
+        /// <param name="context">Information for the final rendering of all fragments of animator</param>
+        Task RenderAllAsync(RenderingEndPointContext context);
     }
 }

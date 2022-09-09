@@ -16,5 +16,9 @@ namespace AceObjectionEngine.Abstractions
         /// Id of object
         /// </summary>
         int Id { get; }
+        /// <summary>
+        /// Name of object
+        /// </summary>
+        string Name { get; }
     }
 }

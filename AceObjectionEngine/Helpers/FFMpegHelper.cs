@@ -7,6 +7,7 @@ using FFMpegCore;
 using FFMpegCore.Pipes;
 using FFMpegCore.Arguments;
 using AceObjectionEngine.Helpers.FFMpegArguments;
+using System.IO;
 
 namespace AceObjectionEngine.Helpers
 {
@@ -20,5 +21,11 @@ namespace AceObjectionEngine.Helpers
 
         public static FFMpegCore.FFMpegArguments FromConcatPipeInput(IEnumerable<IPipeSource> pipes, Action<FFMpegArgumentOptions> addArguments = null)
             => WithInput(new ConcatPipeInputArgument(pipes), addArguments);
+
+        public static FFMpegCore.FFMpegArguments FromStreamInput(Stream stream, Action<FFMpegArgumentOptions> addArguments = null)
+            => WithInput(new StreamInputArgument(stream), addArguments);
+
+        public static FFMpegCore.FFMpegArguments FromConcatStreamInput(IEnumerable<Stream> streams, Action<FFMpegArgumentOptions> addArguments = null)
+            => WithInput(new ConcatStreamInputArgument(streams), addArguments);
     }
 }

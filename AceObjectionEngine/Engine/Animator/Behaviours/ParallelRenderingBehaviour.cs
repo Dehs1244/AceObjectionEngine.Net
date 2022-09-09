@@ -9,16 +9,18 @@ using AceObjectionEngine.Helpers;
 
 namespace AceObjectionEngine.Engine.Animator.Behaviours
 {
-    public class ParallelRenderingBehaviour : IAnimationBehaviour
+    public class ParallelRenderingBehaviour<T> : IAnimationBehaviour
+        where T : IFrameFragment
     {
         public AnimationRenderContext[] Contexts { get; }
-        private FrameRenderFactory _renderFactory { get; }
+        private FrameRenderFactory<T> _renderFactory { get; }
         public int RendersToSkip;
 
+        private List<Task> _parallelTasks = new List<Task>();
         private List<Type> _closedRenders = new List<Type>();
         private List<IAnimationObject> _animatedObjects = new List<IAnimationObject>();
 
-        public ParallelRenderingBehaviour(FrameRenderFactory factory, AnimationRenderContext[] layers)
+        public ParallelRenderingBehaviour(FrameRenderFactory<T> factory, AnimationRenderContext[] layers)
         {
             Contexts = layers;
             _renderFactory = factory;
@@ -26,13 +28,14 @@ namespace AceObjectionEngine.Engine.Animator.Behaviours
 
         private bool _IsNeedToAnimate(IAnimationObject animationObject) => !_closedRenders.Any(x=> TypeHelper.AreSame(x, animationObject.GetType()));
 
-        public ISpriteSource[] Use(int index)
-        {
+        public ISpriteSource[] Use(int index) => UseAsync(index).GetAwaiter().GetResult();
 
+        public async Task<ISpriteSource[]> UseAsync(int index)
+        {
             var isNeedToAnimate = _IsNeedToAnimate(Contexts[index].AnimationObject);
             if (Contexts[index].IsNonRenderObject) return Array.Empty<ISpriteSource>();
 
-            if(isNeedToAnimate) _animatedObjects.Add(Contexts[index].AnimationObject);
+            if (isNeedToAnimate) _animatedObjects.Add(Contexts[index].AnimationObject);
 
             List<ISpriteSource> animationCurrentFrames = new List<ISpriteSource>();
 
@@ -55,16 +58,16 @@ namespace AceObjectionEngine.Engine.Animator.Behaviours
                     Contexts[index].DeceptionLayers != null) _closedRenders.AddRange(Contexts[index].DeceptionLayers.Misleaders);
                 var parallelFrames = Use(index + 1);
                 List<ISpriteSource> renderedParallelAnimation = new List<ISpriteSource>();
-                var breaker = _animatedObjects.Any(x => Contexts[index].ParallelOptions.CheckForBreakOnly(x)) ? Contexts[index].SourceBreaker 
+                var breaker = _animatedObjects.Any(x => Contexts[index].ParallelOptions.CheckForBreakOnly(x)) ? Contexts[index].SourceBreaker
                     : Contexts[index].ParallelOptions.InvertBreaker();
 
-                renderedParallelAnimation.AddRange(FrameRenderFactory.MergeAnimations(animationCurrentFrames, parallelFrames, breaker, Contexts[index].RepeatOnBreak));
+                renderedParallelAnimation.AddRange(AnimationController.MergeAnimations(animationCurrentFrames, parallelFrames, breaker, Contexts[index].RepeatOnBreak));
 
                 animationCurrentFrames = renderedParallelAnimation;
             }
 
             if (Contexts[index].AudioTicks.Count() > 0)
-                _renderFactory.RenderAudio(EnumerableHelper.ToEnumerable(Contexts[index]).ToArray());
+                _parallelTasks.Add(_renderFactory.RenderAudioAsync(EnumerableHelper.ToEnumerable(Contexts[index]).ToArray()));
 
             Contexts[index].AnimationObject.EndAnimation();
 
@@ -82,9 +85,9 @@ namespace AceObjectionEngine.Engine.Animator.Behaviours
             Contexts[index].CurrentRenderFrameDuration = _renderFactory.TimeLineRenderDuration;
             Contexts[index].EndAnimationDuration = Contexts[index].AnimationObject.Sprite.Duration;
             if (Contexts[index].AudioSource != null && isNeedToAnimate)
-                _renderFactory.RenderAudio(EnumerableHelper.ToEnumerable(Contexts[index]).ToArray());
+                _parallelTasks.Add(_renderFactory.RenderAudioAsync(EnumerableHelper.ToEnumerable(Contexts[index]).ToArray()));
 
-            //animationCurrentFrames.AddRange(UseParallelAnimation(layerCollection, index + 1));
+            await Task.WhenAll(_parallelTasks);
             return animationCurrentFrames.ToArray();
         }
     }

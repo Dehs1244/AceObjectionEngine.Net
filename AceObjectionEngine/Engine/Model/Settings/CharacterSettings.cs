@@ -8,11 +8,12 @@ using AceObjectionEngine.Abstractions;
 using AceObjectionEngine.Engine.Enums;
 using AceObjectionEngine.Engine.Enums.SafetyEnums;
 using AceObjectionEngine.Loader.Presets;
-using AceObjectionEngine.Engine.Model.Layout;
+using AceObjectionEngine.Engine.Model.Components;
 using AceObjectionEngine.Loader.Utils;
 using AceObjectionEngine.Engine.Infrastructure;
+using AceObjectionEngine.Engine.Model;
 
-namespace AceObjectionEngine.Engine.Model.Settings
+namespace AceObjectionEngine.Settings
 {
     public class CharacterSettings : BaseSettings<Character>
     {
@@ -20,7 +21,7 @@ namespace AceObjectionEngine.Engine.Model.Settings
         public string NamePlate { get; set; }
         public int? PoseId { get; set; }
         public BlipSexType? Sex { get; set; }
-        public List<ICharacterPose> Poses { get; set; } = new List<ICharacterPose>();
+        public List<AceComponentSpan<ICharacterPose>> Poses { get; set; } = new List<AceComponentSpan<ICharacterPose>>();
         public CharacterLocations Side { get; set; }
 
         public CharacterSettings()
@@ -68,7 +69,13 @@ namespace AceObjectionEngine.Engine.Model.Settings
             {
                 foreach (var assetPoses in json["poses"])
                 {
-                    Poses.Add(new CharacterPose(new CharacterPoseSettings(assetPoses)));
+                    var settings = new CharacterPoseSettings(assetPoses);
+                    Poses.Add(new AceComponentSpan<ICharacterPose>()
+                    {
+                        Component = new Lazy<ICharacterPose>(() => new CharacterPose(new CharacterPoseSettings(assetPoses))),
+                        Id = settings.Id,
+                        Name = settings.Name
+                    });
                 }
             }
 

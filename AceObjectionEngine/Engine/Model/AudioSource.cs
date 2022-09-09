@@ -170,6 +170,24 @@ namespace AceObjectionEngine.Engine.Model
             //   return new AudioSource(tempFile, 0);
         }
 
+        public IAudioSource AddOffset(TimeSpan offset)
+        {
+            var tempFile = new TempFileStream("OBJECTION-AUDIO-ADDING-OFFSET.mp3");
+            tempFile.Close();
+
+             FFMpegArguments
+            .FromFileInput(FilePath)
+            .OutputToFile(tempFile.FilePath, true, options =>
+            {
+                options.WithCustomArgument($"-af areverse,apad=pad_dur={(int)offset.TotalMilliseconds}ms,areverse");
+                options
+                .WithAudioBitrate((int)BitRate);
+            })
+            .ProcessSynchronously();
+
+            return new AudioSource(tempFile);
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -180,9 +198,12 @@ namespace AceObjectionEngine.Engine.Model
         {
             if (_disposed) return;
 
-            if (_fileStream is TempFileStream tempFileStream) tempFileStream.Dispose();
-            else _fileStream.Dispose();
-            Stream.Close();
+            if (disposing)
+            {
+                if (_fileStream is TempFileStream tempFileStream) tempFileStream.Dispose();
+                else _fileStream.Dispose();
+                Stream.Close();
+            }
             _disposed = true;
         }
     }
