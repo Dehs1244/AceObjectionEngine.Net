@@ -15,7 +15,7 @@ namespace AceObjectionEngine.Settings
 
         public override void FromJson(AssetJson json)
         {
-            ImagePath = json["imagePath"];
+            ImagePath =  NormalizePath(json["imagePath"]);
         }
     }
 }

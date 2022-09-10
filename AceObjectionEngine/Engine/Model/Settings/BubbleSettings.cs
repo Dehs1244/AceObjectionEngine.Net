@@ -39,8 +39,8 @@ namespace AceObjectionEngine.Settings
         {
             Id = json["id"];
             Name = json["name"];
-            ImagePath = json["imagePath"];
-            Audio = AudioSource.FromFile(json["audioPath"]);
+            ImagePath = NormalizePath(json["imagePath"]);
+            Audio = AudioSource.FromFile(NormalizePath(json["audioPath"]));
             Effects.Add(new ShakeEffect(AnimatorSize, ShakeRange, Audio));
         }
     }

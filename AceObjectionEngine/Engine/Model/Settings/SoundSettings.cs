@@ -41,7 +41,7 @@ namespace AceObjectionEngine.Settings
             Name = json["name"];
             Volume = json["volume"];
             if (json.ContainsKey("url")) throw new ObjectionNotLoadedException(this);
-            AudioPath = json["audioPath"];
+            AudioPath =  NormalizePath(json["audioPath"]);
         }
     }
 }

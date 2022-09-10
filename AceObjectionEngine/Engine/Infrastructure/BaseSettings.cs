@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AceObjectionEngine.Engine.Utils;
+using System.IO;
 
 namespace AceObjectionEngine.Engine.Infrastructure
 {
@@ -37,6 +38,21 @@ namespace AceObjectionEngine.Engine.Infrastructure
         public virtual void ApplyOptions(ref T objection)
         {
 
+        }
+
+        protected string NormalizePath(string path)
+        {
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                string normalizedPath;
+                normalizedPath = path.Replace('\\', Path.DirectorySeparatorChar);
+                normalizedPath = path.Replace("\\\\", Path.DirectorySeparatorChar.ToString());
+                return normalizedPath;
+            }
+            else
+            {
+                return path.Replace('/', Path.DirectorySeparatorChar);
+            }
         }
 
         public void Apply(T objection)

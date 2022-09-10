@@ -40,9 +40,9 @@ namespace AceObjectionEngine.Settings
             Id = json["id"];
             Name = json["name"];
             if (json.ContainsKey("idleImageUrl")) throw new ObjectionNotLoadedException(this);
-            IdleImagePath = json["idleImagePath"];
+            IdleImagePath =  NormalizePath(json["idleImagePath"]);
             if (json.ContainsKey("speakImageUrl")) throw new ObjectionNotLoadedException(this);
-            if (json.ContainsKey("speakImagePath")) SpeakImagePath = json["speakImagePath"];
+            if (json.ContainsKey("speakImagePath")) SpeakImagePath =  NormalizePath(json["speakImagePath"]);
             else SpeakImagePath = IdleImagePath;
             if (json.ContainsKey("isSpeedlines")) IsSpeedLines = true;
 
@@ -52,7 +52,7 @@ namespace AceObjectionEngine.Settings
                 if (assetAudio.ContainsKey("fileName")) throw new ObjectionNotLoadedException(this);
                 audioTicks.Add(new Audio(new SoundSettings()
                 {
-                    AudioPath = assetAudio["filePath"],
+                    AudioPath = NormalizePath(assetAudio["filePath"]),
                     Name = assetAudio["name"],
                     Volume = assetAudio["volume"],
                     StartPlay = TimeSpan.FromMilliseconds(Frame.SamplingFromObjectionLolTime((double)assetAudio["time"]))
@@ -63,7 +63,7 @@ namespace AceObjectionEngine.Settings
             foreach(var assetPoseState in json["states"])
             {
                 if(assetPoseState.ContainsKey("imageUrl")) throw new ObjectionNotLoadedException(this);
-                var state = Sprite.FromFile(assetPoseState["fileName"]);
+                var state = Sprite.FromFile(NormalizePath(assetPoseState["fileName"]));
                 poseState.Add(new Engine.PoseActions.SinglePoseAction()
                 {
                     State = state,

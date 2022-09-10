@@ -32,9 +32,9 @@ namespace AceObjectionEngine.Settings
             Id = json["id"];
             Name = json["name"];
             if (json.ContainsKey("url")) throw new ObjectionNotLoadedException(this);
-            ImagePath = json["imagePath"];
+            ImagePath = NormalizePath(json["imagePath"]);
             if (json.ContainsKey("deskUrl")) throw new ObjectionNotLoadedException(this);
-            if (json.ContainsKey("imageDeskPath")) ImageDeskPath = json["imageDeskPath"];
+            if (json.ContainsKey("imageDeskPath")) ImageDeskPath = NormalizePath(json["imageDeskPath"]);
             else ImageDeskPath = null;
             IsWide = json["isWide"];
         }
