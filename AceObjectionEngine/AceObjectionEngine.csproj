@@ -4,7 +4,7 @@
 	  <TargetFrameworks>net462;net5.0;net6.0;netstandard2.0</TargetFrameworks>
 	  
 	  <PackageId>AceObjectionEngine.Net</PackageId>
-	  <Version>1.0.5</Version>
+	  <Version>1.1.0</Version>
 	  <Authors>Dehs</Authors>
 	  <Company>Blowout Studio</Company>
 	  <PackageTags>Animation;FFMpeg;Ace Attorney;Objection;Ace Attorney Objection;Video Animation;Video;Audio Animation</PackageTags>
@@ -20,17 +20,15 @@
 		  See the documentation in the github repository: https://github.com/Dehs1244/AceObjectionEngine.Net
 	  </Description>
 	  <PackageReleaseNotes>
-		  - Added support for desks
-		  - Added branching of the render
-		  - Added rendering behaviours
-		  - Added options to parallel rendering
-		  - Fixed pose animation
-		  - Fixed sounds
-		  - Added a method to the scene builder to add Custom Components
-		  - Added a method to the scene builder to add simple sounds
-		  - Added useful attributes to components
-		  - Audio Improvements
-		  - Added fixate property to audio (looping)
+		  -Render Optimization 
+		  -Loader optimization (loading of all objects is now 10 times faster)
+		  -AceComponentSpan (abstract information about loading component)
+		  -Multiple backgrounds
+		  -Global audio for all animation
+		  -Fix bug with bubbles
+		  -New scene rendering system
+		  -Fix bug with audio sources
+		  -Loader Linux support
 	  </PackageReleaseNotes>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <RepositoryUrl>https://github.com/Dehs1244/AceObjectionEngine.Net</RepositoryUrl>

@@ -8,6 +8,9 @@ using AceObjectionEngine.Engine.MediaMakers;
 
 namespace AceObjectionEngine.Engine.Infrastructure
 {
+    /// <summary>
+    /// Initialization class of Media
+    /// </summary>
     public static class MediaMaker
     {
         private static Lazy<IMediaMaker<ISpriteSource>> _spriteMaker = new Lazy<IMediaMaker<ISpriteSource>>(() => new DefaultSpriteMaker());

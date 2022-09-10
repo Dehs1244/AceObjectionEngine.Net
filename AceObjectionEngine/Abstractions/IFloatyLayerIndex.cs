@@ -13,8 +13,14 @@ namespace AceObjectionEngine.Abstractions
     /// </summary>
     public interface IFloatyLayerIndex
     {
+        /// <summary>
+        /// Binding to an index
+        /// </summary>
         SingleEntry<int> LayerIndexer { get; set; }
 
+        /// <summary>
+        /// Dependencies that the index will rely on
+        /// </summary>
         Type[] DependencyIndexer { get; }
     }
 }

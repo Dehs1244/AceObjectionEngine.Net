@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace AceObjectionEngine.Engine.Infrastructure
 {
+    /// <summary>
+    /// Provides support for one-time initialization
+    /// </summary>
+    /// <typeparam name="T">Object that need to be one-time initialization</typeparam>
     public struct SingleEntry<T>
     {
         private T _value;

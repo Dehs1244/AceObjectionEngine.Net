@@ -7,6 +7,9 @@ using System.IO;
 
 namespace AceObjectionEngine.Abstractions
 {
+    /// <summary>
+    /// Implementation Interface Video Fragment
+    /// </summary>
     public interface IFrameFragment : IDisposable
     {
         Stream GetStream();
